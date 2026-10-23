@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      UV_NO_SYNC: "1"  # uv run would sync the default groups, rumoca included
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked --no-default-groups --group lint
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+
+  test:
+    # layout, bundle, rumoca and the CasADi models against the reference results; rumoca is built from its git
+    # commit (Rust), the uv cache keeps the wheel
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --locked
+      - name: rumoca and CasADi are installed (the rumoca tests skip without them)
+        run: uv run python -c "import casadi, rumoca"
+      - run: uv run pytest -m "not openmodelica"
+
+  openmodelica:
+    # the examples and validation models simulated in the official OpenModelica image, against their references
+    runs-on: ubuntu-latest
+    env:
+      UV_NO_SYNC: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: docker pull openmodelica/openmodelica:v1.26.9-ompython
+      - run: uv sync --locked --no-default-groups --group test
+      - run: uv run pytest -m openmodelica
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv build
+      - run: uvx twine check --strict dist/*
+      - name: The wheel carries the library
+        run: |
+          uv venv /tmp/wheel
+          uv pip install --python /tmp/wheel/bin/python dist/*.whl
+          cd /tmp && /tmp/wheel/bin/python -c "
+          import fastsmoothbuildings as f
+          assert (f.LIBRARY / 'package.mo').is_file(), f.LIBRARY
+          assert 'site-packages' in str(f.ROOT), f.ROOT
+          print(f.__version__, f.ROOT)
+          "
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

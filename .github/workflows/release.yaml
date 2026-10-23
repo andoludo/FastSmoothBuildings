@@ -1,0 +1,64 @@
+name: Release
+
+# A tag v<version> publishes the Python package on PyPI (trusted publishing, environment "pypi") and a GitHub
+# release with the library as a zip for OpenModelica and Dymola; the tag must match the version annotation of the
+# library.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: The tag is the version of the library
+        run: |
+          version=$(sed -n 's/^\s*version\s*=\s*"\([^"]*\)".*/\1/p' FastSmoothBuildings/package.mo | head -n 1)
+          test "${GITHUB_REF_NAME}" = "v${version}" || { echo "tag ${GITHUB_REF_NAME}, library ${version}"; exit 1; }
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
+      - run: uv build
+      - run: uvx twine check --strict dist/*
+      - run: |
+          mkdir modelica
+          zip -qr "modelica/FastSmoothBuildings-${VERSION}.zip" FastSmoothBuildings LICENSE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: modelica
+          path: modelica/
+
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
