@@ -12,6 +12,7 @@ INDENT = "  "
 WITHIN = re.compile(r"\A\s*within\b[^;]*;[ \t]*\n")
 DOCUMENTATION = re.compile(r"\bDocumentation\s*\(")
 CLASS_ANNOTATION = re.compile(rf"^{INDENT}annotation\b")
+EXAMPLES = frozenset({"Examples", "Validation", "UsersGuide"})
 
 
 def read_class(path: Path) -> list[str]:
@@ -93,15 +94,17 @@ def _indented(lines: Sequence[str], depth: int) -> list[str]:
     return [INDENT * depth + line if line else line for line in lines]
 
 
-def _package_lines(package: Path, depth: int) -> list[str]:
+def _package_lines(package: Path, depth: int, skip: frozenset[str]) -> list[str]:
     *body, end = read_class(package / "package.mo")
     annotation = _class_annotation(body)
     lines = _indented(body[:annotation], depth)
     # a blank line separates the classes, except the first one from a declaration without elements
     separator = [""] if any(line.rstrip().endswith(";") for line in body[:annotation]) else []
     for name in package_order(package):
+        if name in skip:
+            continue
         if (package / name / "package.mo").is_file():
-            child = _package_lines(package / name, depth + 1)
+            child = _package_lines(package / name, depth + 1, skip)
         elif (package / f"{name}.mo").is_file():
             child = _indented(read_class(package / f"{name}.mo"), depth + 1)
         else:
@@ -111,10 +114,11 @@ def _package_lines(package: Path, depth: int) -> list[str]:
     return [*lines, *_indented([*body[annotation:], end], depth)]
 
 
-def bundle(library: Path | None = None, *, documentation: bool = True) -> str:
+def bundle(library: Path | None = None, *, documentation: bool = True, examples: bool = True) -> str:
     """The library at ``library`` (the folder holding its ``package.mo``, FastSmoothBuildings by default) as the
-    text of one file; ``documentation=False`` leaves out the ``Documentation`` annotations."""
-    text = "\n".join(_package_lines(library or LIBRARY, 0)) + "\n"
+    text of one file; ``documentation=False`` leaves out the ``Documentation`` annotations, ``examples=False`` the
+    packages ``Examples``, ``Validation`` and ``UsersGuide`` (what a model that embeds the library does not use)."""
+    text = "\n".join(_package_lines(library or LIBRARY, 0, frozenset() if examples else EXAMPLES)) + "\n"
     return text if documentation else strip_documentation(text)
 
 
