@@ -23,7 +23,11 @@ or the default of a record: the records of the constructions carry their counts 
 <li>the model is an explicit ODE: no algebraic loop that rumoca would have to solve, no event;</li>
 <li>every function is smooth (see <a href=\"modelica://FastSmoothBuildings.UsersGuide.Smoothing\">Smoothing</a>),
 and conditions on parameters only are evaluated before the translation;</li>
-<li>equations carry no description strings.</li>
+<li>equations carry no description strings;</li>
+<li>a table given to <a href=\"modelica://FastSmoothBuildings.Utilities.dayTable\">dayTable</a> is a parameter,
+not a literal matrix in the call, and at the top level of a model the call is an equation, not the binding of a
+declaration: rumoca 0.10.3 expands the loop of the function into extra equations otherwise (the zones and the
+ideal systems of the library call it this way).</li>
 </ul>
 <p>
 rumoca 0.10.3 from the commit <code>33c21141</code> of its main branch exports connected models to CasADi; the
