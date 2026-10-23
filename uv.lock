@@ -706,6 +706,7 @@ wheels = [
 
 [[package]]
 name = "fastsmoothbuildings"
+version = "0.2.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
@@ -789,8 +790,8 @@ study = [
     { name = "plotly", specifier = ">=6,<7" },
     { name = "pyyaml", specifier = ">=6,<7" },
     { name = "rumoca", git = "https://github.com/CogniPilot/rumoca?subdirectory=crates%2Frumoca-bind-python&rev=33c21141791cbc341f4788ff6353d2f49d1c740a" },
-    { name = "trano", specifier = ">=0.59,<1" },
-    { name = "trano-optimization", specifier = ">=0.2.0,<1" },
+    { name = "trano", specifier = ">=0.61,<1" },
+    { name = "trano-optimization", specifier = ">=0.3.0,<1" },
     { name = "trano-simulate", specifier = ">=0.2.0,<1" },
     { name = "types-pyyaml", specifier = ">=6,<7" },
 ]
@@ -3778,11 +3779,12 @@ wheels = [
 
 [[package]]
 name = "trano"
-version = "0.59.0"
+version = "0.61.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "buildingspy" },
     { name = "docker" },
+    { name = "fastsmoothbuildings" },
     { name = "jinja2" },
     { name = "linkml" },
     { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -3797,14 +3799,14 @@ dependencies = [
     { name = "typer" },
     { name = "yattag" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/93/4e/33bd185c8caed79531a5821a6714dfea97ca4e56f17608f389bac5ff8c09/trano-0.59.0.tar.gz", hash = "sha256:a0a4e3bcead2cefb5a99f2836bef4c21997f2b8e6ada8b087c1f3af38d1baef2", size = 288060, upload-time = "2026-10-23T19:20:25.946Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d8/71/6079b61eafc70db1e1eeba738d01c46696abe89ca55742aff1d289365589/trano-0.61.0.tar.gz", hash = "sha256:8af1d22c9b8418d48862e603a034e186908a4325025ebb95130bf4a10da0776f", size = 255999, upload-time = "2026-10-23T20:04:36.463Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dd/fc/e1de96c1313e5f6a84958d67306d6fe067d4b1afac661eed146c121d9152/trano-0.59.0-py3-none-any.whl", hash = "sha256:53e2094a49dcd5bd2a94602d42116fd4ca3910adf123ad01d3a2e8d151eda590", size = 344039, upload-time = "2026-10-23T19:20:24.324Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/1d/db4f3b78d95378c5510218b883b891454da365b15ed45f081abf2b98ff39/trano-0.61.0-py3-none-any.whl", hash = "sha256:9833b8635d6aaa758681e26867859217f3424fc9ad0c1890da2390bccb5ff71b", size = 312451, upload-time = "2026-10-23T20:04:35.068Z" },
 ]
 
 [[package]]
 name = "trano-optimization"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "casadi" },
@@ -3813,9 +3815,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "rumoca" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/80/6b/29a8306eefc60a9c6153be05785486e9b8772e2e09a3b8fc2f14eeadd7e0/trano_optimization-0.2.0.tar.gz", hash = "sha256:b44948e72f8c0e885f4a4765257e9ae689d5a1430bbd2f1a99c58e74e046018a", size = 15684, upload-time = "2026-10-20T17:59:53.348Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/41/c29f3d22209e0072932f7974f5ea25df3860c8f9dd8009451923b2fcf36d/trano_optimization-0.3.0.tar.gz", hash = "sha256:6d4c0bcdc6fa1d6ad0133775137c5907e7dae37844e1dee717f14b62ea97ab4d", size = 15926, upload-time = "2026-10-23T20:06:26.793Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/91/94/4d4c35d5c755e6b361b51c0a9348889939031f9fab8592585c89a801489f/trano_optimization-0.2.0-py3-none-any.whl", hash = "sha256:c8d72f15685a8d3991bcbca089fc17a12b3f9e8303a15147c0ba0418967ba170", size = 15590, upload-time = "2026-10-20T17:59:52.182Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/6d/ce4c2c66876b76100bd6c3394c21e1127d53a68d36b4a952c8b97d88de02/trano_optimization-0.3.0-py3-none-any.whl", hash = "sha256:caf8085963577cefc1fb90323dd8059ca4f31c3cba4ea3c872ddcd2f8b8b16cd", size = 15815, upload-time = "2026-10-23T20:06:25.799Z" },
 ]
 
 [[package]]

@@ -3,7 +3,7 @@
     python scripts/bump_version.py            # prints the version
     python scripts/bump_version.py minor      # 0.1.0 -> 0.2.0, versionDate today; prints the new version
 
-The version of the Python package follows: hatchling reads it from the same annotation.
+The version of the Python package follows: the script writes it into pyproject.toml too.
 """
 
 from __future__ import annotations
@@ -15,6 +15,8 @@ from collections.abc import Sequence
 from pathlib import Path
 
 PACKAGE = Path(__file__).resolve().parents[1] / "FastSmoothBuildings" / "package.mo"
+PYPROJECT = Path(__file__).resolve().parents[1] / "pyproject.toml"
+PROJECT_VERSION = re.compile(r'^(?P<head>version\s*=\s*")(?P<version>[^"]+)(?P<tail>")', re.MULTILINE)
 VERSION = re.compile(r'^(?P<head>\s*version\s*=\s*")(?P<version>\d+\.\d+\.\d+)(?P<tail>")', re.MULTILINE)
 DATE = re.compile(r'(?P<head>\bversionDate\s*=\s*")[^"]*(?P<tail>")')
 PARTS = ("major", "minor", "patch")
@@ -48,11 +50,16 @@ def main(arguments: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("part", nargs="?", choices=PARTS, help="the part to raise; none to print the version")
     parser.add_argument("--package", type=Path, default=PACKAGE, help="the package.mo of the library")
+    parser.add_argument("--pyproject", type=Path, default=PYPROJECT, help="the pyproject.toml of the package")
     parsed = parser.parse_args(arguments)
     text = parsed.package.read_text(encoding="utf-8")
     if parsed.part is not None:
         text = bump(text, parsed.part, datetime.datetime.now(tz=datetime.UTC).date())
         parsed.package.write_text(text, encoding="utf-8")
+        project = parsed.pyproject.read_text(encoding="utf-8")
+        new = version(text)
+        project = PROJECT_VERSION.sub(lambda match: f"{match['head']}{new}{match['tail']}", project, count=1)
+        parsed.pyproject.write_text(project, encoding="utf-8")
     print(version(text))
 
 

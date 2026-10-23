@@ -1,6 +1,8 @@
 [project]
 name = "fastsmoothbuildings"
-dynamic = ["version"]
+# the version of the Modelica library (its version annotation), written here too by scripts/bump_version.py: a
+# static version lets uv resolve trano, which depends on this package, in the study group
+version = "0.2.0"
 description = "Smooth, event-free Modelica models of buildings and their systems, close to Buildings and translated into an explicit CasADi ODE for model predictive control."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -45,9 +47,9 @@ dev = [{ include-group = "lint" }, { include-group = "rumoca" }]
 # study: the study against Buildings with the models trano generates (study/), and the documentation site
 study = [
     { include-group = "rumoca" },
-    "trano>=0.59,<1",
+    "trano>=0.61,<1",
     "trano-simulate>=0.2.0,<1",
-    "trano-optimization>=0.2.0,<1",
+    "trano-optimization>=0.3.0,<1",
     "pandas>=2.2,<3",
     "plotly>=6,<7",
     "pyyaml>=6,<7",
@@ -73,11 +75,6 @@ rumoca = { git = "https://github.com/CogniPilot/rumoca", rev = "33c21141791cbc34
 [build-system]
 requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
-
-[tool.hatch.version]
-# the version of the Modelica library is the version of the package
-path = "FastSmoothBuildings/package.mo"
-pattern = '(?m)^\s*version\s*=\s*"(?P<version>[^"]+)"'
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/fastsmoothbuildings"]
