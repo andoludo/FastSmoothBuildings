@@ -1,0 +1,93 @@
+site_name: FastSmoothBuildings
+site_description: Smooth, event-free Modelica models of buildings and their systems, close to Buildings and translated into CasADi
+site_url: https://andoludo.github.io/FastSmoothBuildings/
+repo_name: andoludo/FastSmoothBuildings
+repo_url: https://github.com/andoludo/FastSmoothBuildings
+edit_uri: edit/main/docs/
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/lightbulb-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to system preference
+  features:
+    - content.code.copy
+    - navigation.indexes
+    - navigation.path
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - markdown_include.include:
+      base_path: docs
+extra_javascript:
+  - https://unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js
+extra_css:
+  - stylesheets/modelica.css
+exclude_docs: |
+  gen_pages.py
+not_in_nav: |
+  validation/figures/
+nav:
+  - Home: index.md
+  - Guide:
+      - Overview and equations: guide/overview.md
+      - Development: development.md
+      - Migration from trano: migration/phase1.md
+      - Migration trials: migration/phase0.md
+  - Library: library/
+  - Validation:
+      - BESTEST: validation/bestest.md
+      - Replaying Buildings: validation/replay.md
+      - Against Buildings, parameter by parameter: validation/study.md
+      - Improvement plan: validation/improvement_plan.md
+  - Analysis:
+      - analysis/index.md
+      - Requirements: analysis/01_requirements.md
+      - BESTEST: analysis/02_bestest.md
+      - Study against Buildings: analysis/03_study_against_buildings.md
+      - Library changes: analysis/04_library_changes.md
+      - Shading: analysis/05_shading.md
+      - "MPC: rumoca, CasADi, IPOPT": analysis/06_mpc_rumoca_ipopt.md
+      - Closed loop and MPC states: analysis/07_closed_loop_and_mpc_states.md
+      - House before renovation: analysis/08_house_before_renovation.md
+      - Boiler water loop: analysis/09_boiler_water_loop.md
+      - Open gaps: analysis/10_open_gaps.md

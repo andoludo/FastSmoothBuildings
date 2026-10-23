@@ -1,0 +1,33 @@
+name: Docs
+
+# The documentation site on GitHub Pages: built on every push to main (and on demand), published to the branch
+# gh-pages. The pages of the library come from the Documentation annotations of its classes (docs/gen_pages.py).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      UV_NO_SYNC: "1"
+      DISABLE_MKDOCS_2_WARNING: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked --no-default-groups --group docs
+      - run: uv run mkdocs build --strict
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

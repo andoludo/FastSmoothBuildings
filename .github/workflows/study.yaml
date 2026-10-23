@@ -1,0 +1,137 @@
+name: Study
+
+# FastSmoothBuildings against Buildings on BESTEST cases and two houses (study/buildings): every (case, variant) pair
+# is simulated with both libraries in its own job, the results are collected, the report rendered and both are
+# committed to the branch the workflow runs on. On demand only: a year of Buildings per BESTEST variant.
+on:
+  # A workflow that is not on the default branch cannot be dispatched by hand: a push whose message carries [study]
+  # runs it on its branch, [study 960 residential_after | base] a part of it (the results the workflow commits do not
+  # carry the tag, so it does not run on itself).
+  push:
+    paths:
+      - ".github/workflows/study.yaml"
+      - "study/buildings/**"
+      - "FastSmoothBuildings/**"
+      - "uv.lock"
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case ids to run, separated by spaces (all when empty)"
+        required: false
+        default: ""
+      variants:
+        description: "Variants to run, separated by spaces (all when empty; 'base' for the unperturbed cases)"
+        required: false
+        default: ""
+
+env:
+  TRANO_MODELICA_LIBRARIES: ${{ github.workspace }}/.cache/omlibs
+
+jobs:
+  plan:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[study')
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --group study
+      - id: plan
+        env:
+          MESSAGE: ${{ github.event.head_commit.message }}
+          CASES: ${{ inputs.cases }}
+          VARIANTS: ${{ inputs.variants }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            matrix=$(uv run python -m study.buildings plan $CASES --variants $VARIANTS)
+          else
+            matrix=$(uv run python -m study.buildings plan --from-message "$MESSAGE")
+          fi
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  simulate:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --group study
+      - name: Modelica libraries
+        uses: ./.github/actions/modelica-libraries
+      - name: Restore the cached runs
+        uses: actions/cache@v4
+        with:
+          path: .cache/study/${{ matrix.case }}/${{ matrix.variant }}
+          key: study-${{ matrix.case }}-${{ matrix.variant }}-${{ github.run_id }}
+          restore-keys: study-${{ matrix.case }}-${{ matrix.variant }}-
+      - name: Simulate with Buildings and FastSmoothBuildings
+        run: uv run python -m study.buildings run ${{ matrix.case }} --variants ${{ matrix.variant }}
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: study-${{ matrix.case }}-${{ matrix.variant }}
+          path: study/buildings/results/${{ matrix.case }}/${{ matrix.variant }}
+          if-no-files-found: ignore
+      - name: Keep the OpenModelica logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.case }}-${{ matrix.variant }}
+          path: |
+            .cache/study/${{ matrix.case }}/${{ matrix.variant }}/*/omc.log
+            .cache/study/${{ matrix.case }}/${{ matrix.variant }}/*/*.yaml
+          if-no-files-found: ignore
+
+  collect:
+    needs: [plan, simulate]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --group study
+      - name: Download the results of every job
+        uses: actions/download-artifact@v4
+        with:
+          pattern: study-*
+          path: collected
+      - name: Place the results
+        run: |
+          shopt -s nullglob
+          for directory in collected/study-*; do
+            name=$(basename "$directory"); name=${name#study-}
+            case_id=${name%%-*}; variant=${name#*-}
+            mkdir -p "study/buildings/results/$case_id/$variant"
+            cp -r "$directory"/. "study/buildings/results/$case_id/$variant/"
+          done
+          find study/buildings/results -type f | sort
+      - name: Render the report and the documentation page
+        run: uv run python -m study.buildings report --docs
+      - name: Commit the results and the page
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all -- study/buildings docs/validation
+          git commit -m "Study: results of run ${{ github.run_id }}" || { echo "nothing to commit"; exit 0; }
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}" && exit 0
+            sleep 15
+          done
+          exit 1

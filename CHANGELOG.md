@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+
+* Every class of the library has its documentation (`Documentation(info, revisions)`): purpose, equations,
+  parameters, relation to Buildings, use. A test keeps every class documented and every link pointing to a class.
+* The documentation site, on GitHub Pages: the guide, a page per class generated from its documentation, the
+  validation and the analysis.
+* The study against Buildings moves here from trano (`study/`): the closed loop of both libraries on BESTEST cases
+  and two houses with perturbations of their descriptions (`study.buildings`), the replay of the controls of
+  Buildings (`study.replay`), the reports of the analysis with their scripts and results (`study.analysis`), and
+  the workflow that runs it (`study.yaml`).
+
 ## 0.2.0
 
 * `bundle(examples=False)` leaves out the packages `Examples`, `Validation` and `UsersGuide`: the library as a
