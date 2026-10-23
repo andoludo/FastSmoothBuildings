@@ -1,0 +1,16 @@
+regStep
+smoothMax
+smoothMin
+smoothLimit
+smoothLimitInside
+positivePart
+naturalConvection
+convectionCoefficient
+polynomialFit
+equalPercentage
+valveConductance
+quadraticFlow
+timeOfDay
+occupancy
+dayTable
+polynomial

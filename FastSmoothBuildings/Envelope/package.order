@@ -1,0 +1,8 @@
+PartialSurface
+PartialOpaque
+OuterWall
+BoundaryWall
+AdiabaticWall
+InternalWall
+Window
+Functions
