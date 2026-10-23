@@ -114,6 +114,22 @@ dev = [
     { name = "ruff" },
     { name = "rumoca" },
 ]
+lint = [
+    { name = "mypy" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+rumoca = [
+    { name = "casadi" },
+    { name = "rumoca" },
+]
+test = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pytest" },
+]
 
 [package.metadata]
 
@@ -125,6 +141,20 @@ dev = [
     { name = "pytest", specifier = ">=9.0.3,<10" },
     { name = "ruff", specifier = ">=0.15.16,<0.16" },
     { name = "rumoca", git = "https://github.com/CogniPilot/rumoca?subdirectory=crates%2Frumoca-bind-python&rev=33c21141791cbc341f4788ff6353d2f49d1c740a" },
+]
+lint = [
+    { name = "mypy", specifier = ">=2.1.0,<3" },
+    { name = "numpy", specifier = ">=2,<3" },
+    { name = "pytest", specifier = ">=9.0.3,<10" },
+    { name = "ruff", specifier = ">=0.15.16,<0.16" },
+]
+rumoca = [
+    { name = "casadi", specifier = ">=3.6,<4" },
+    { name = "rumoca", git = "https://github.com/CogniPilot/rumoca?subdirectory=crates%2Frumoca-bind-python&rev=33c21141791cbc341f4788ff6353d2f49d1c740a" },
+]
+test = [
+    { name = "numpy", specifier = ">=2,<3" },
+    { name = "pytest", specifier = ">=9.0.3,<10" },
 ]
 
 [[package]]

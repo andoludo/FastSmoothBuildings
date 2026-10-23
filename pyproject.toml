@@ -36,14 +36,12 @@ Issues = "https://github.com/andoludo/FastSmoothBuildings/issues"
 Changelog = "https://github.com/andoludo/FastSmoothBuildings/blob/main/CHANGELOG.md"
 
 [dependency-groups]
-dev = [
-    "casadi>=3.6,<4",
-    "mypy>=2.1.0,<3",
-    "numpy>=2,<3",
-    "pytest>=9.0.3,<10",
-    "rumoca>=0.10.3,<0.11",
-    "ruff>=0.15.16,<0.16",
-]
+# test: the layout, the bundle and the OpenModelica tests; rumoca: the translation into CasADi (rumoca is built
+# from its git commit, which takes minutes); lint: the static checks
+test = ["numpy>=2,<3", "pytest>=9.0.3,<10"]
+rumoca = ["casadi>=3.6,<4", "rumoca>=0.10.3,<0.11"]
+lint = [{ include-group = "test" }, "mypy>=2.1.0,<3", "ruff>=0.15.16,<0.16"]
+dev = [{ include-group = "lint" }, { include-group = "rumoca" }]
 
 [tool.uv]
 default-groups = ["dev"]

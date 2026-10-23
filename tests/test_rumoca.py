@@ -6,16 +6,16 @@ import math
 from functools import cache
 from typing import Any
 
-import casadi as ca
 import numpy as np
 import numpy.typing as npt
 import pytest
-import rumoca
 
 import fastsmoothbuildings
 from tests.cases import CASES, Case
 from tests.openmodelica import read
 
+ca = pytest.importorskip("casadi")
+rumoca = pytest.importorskip("rumoca")
 Vector = npt.NDArray[np.float64]
 
 

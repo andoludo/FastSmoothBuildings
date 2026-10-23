@@ -20,7 +20,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - run: uv sync --locked
+      - run: uv sync --locked --no-default-groups --group lint
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run mypy
@@ -40,6 +40,8 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync --locked
+      - name: rumoca and CasADi are installed (the rumoca tests skip without them)
+        run: uv run python -c "import casadi, rumoca"
       - run: uv run pytest -m "not openmodelica"
 
   openmodelica:
@@ -51,7 +53,7 @@ jobs:
         with:
           enable-cache: true
       - run: docker pull openmodelica/openmodelica:v1.26.9-ompython
-      - run: uv sync --locked
+      - run: uv sync --locked --no-default-groups --group test
       - run: uv run pytest -m openmodelica
 
   build:
