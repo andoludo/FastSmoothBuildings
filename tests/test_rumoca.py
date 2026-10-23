@@ -24,10 +24,11 @@ def wrapper(case: Case) -> str:
 
 
 @cache
-def translate(source: str, model: str, *, bundle: bool = False) -> Any:  # noqa: ANN401 - rumoca's CasADi export
+def translate(source: str, model: str, *, bundle: bool = False, examples: bool = True) -> Any:  # noqa: ANN401
     """The CasADi export of ``model`` in ``source``, the library read from its folder or embedded as one file."""
     if bundle:
-        return rumoca.Session().loads(fastsmoothbuildings.bundle() + source, model=model).to_casadi()
+        text = fastsmoothbuildings.bundle(examples=examples) + source
+        return rumoca.Session().loads(text, model=model).to_casadi()
     return rumoca.Session(roots=[str(fastsmoothbuildings.LIBRARY)]).loads(source, model=model).to_casadi()
 
 
@@ -167,3 +168,20 @@ def test_overhangs_and_side_fins_shade_as_buildings(ver_azi: float, alt: float, 
     )
     assert fractions[0] == pytest.approx(overhang, abs=0.02)
     assert fractions[1] == pytest.approx(fins, abs=0.02)
+
+
+def test_the_bundle_without_examples_translates_as_the_folder() -> None:
+    """The library as a model embeds it (no examples, no User's Guide) gives the same CasADi model."""
+    source = PROBE.format(
+        states="  Real s0(start=0, fixed=true);",
+        equations="  der(s0) = FastSmoothBuildings.Envelope.Functions.gapConductance(u1, u2, 0.012, 0.025, 3.723e-6,"
+        " 4.94e-8, 1006, 0.02897, u3, 0.84, 2.0);",
+    )
+    folder = translate(source, "Probe")
+    lean = translate(source, "Probe", bundle=True, examples=False)
+    _, _, parameters = defaults(folder)
+    inputs = np.array([290.5, 275.5, 0.84])
+    np.testing.assert_array_equal(
+        derivatives(folder, 0.0, np.zeros(1), inputs, parameters),
+        derivatives(lean, 0.0, np.zeros(1), inputs, defaults(lean)[2]),
+    )

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import fastsmoothbuildings
@@ -65,3 +66,13 @@ def test_the_scanners_skip_strings_and_comments() -> None:
     assert code_starts(lines) == [True, False, False, True, False, True, True]
     text = 'a "b" /* c */ d // e\nf'
     assert "".join(c for c, keep in zip(text, code_mask(text), strict=True) if keep) == "a   d \nf"
+
+
+def test_the_bundle_without_examples_keeps_the_models() -> None:
+    full = fastsmoothbuildings.bundle()
+    lean = fastsmoothbuildings.bundle(examples=False)
+    for package in ("Examples", "Validation", "UsersGuide"):
+        assert re.search(rf"\bpackage {package}\b", full)
+        assert not re.search(rf"\bpackage {package}\b", lean)
+    for model in ("model Zone", "model Window", "model HeatPump", "function regStep"):
+        assert model in lean

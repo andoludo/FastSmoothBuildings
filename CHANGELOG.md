@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+* `bundle(examples=False)` leaves out the packages `Examples`, `Validation` and `UsersGuide`: the library as a
+  generated model embeds it (trano).
+* Releases are automatic: every change merged into `main` is released once CI passes on it, as in trano.
+* The GitHub release carries only the wheel, the sdist and the library as a zip.
+
 ## 0.1.0
 
 First release of the library as FastSmoothBuildings, migrated from the `FastModel` package of
