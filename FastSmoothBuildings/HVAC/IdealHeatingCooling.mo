@@ -21,5 +21,36 @@ equation
         fillPattern=FillPattern.Solid),
       Rectangle(extent={{70,40},{90,-40}}, lineColor={191,0,0}, fillColor={191,0,0},
         fillPattern=FillPattern.Solid),
-      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Ideal heating and cooling given as a heat flow rate: the input <code>Q_flow</code>, positive for heating and
+negative for cooling, split between the room air and its radiant star. It has no controller and no limit, so that
+the heat flow rate can be a decision of an optimal control problem.
+</p>
+<h4>Equations</h4>
+<p>
+<code>heatPortCon.Q_flow</code> = &minus;(1 &minus; <i>f<sub>Rad</sub></i>) <i>Q</i>, &nbsp;
+<code>heatPortRad.Q_flow</code> = &minus;<i>f<sub>Rad</sub></i> <i>Q</i>,
+</p>
+<p>
+the ports carrying the heat into the component.
+</p>
+<h4>Parameters</h4>
+<p>
+<code>fraRad</code> = 0, the radiant share.
+</p>
+<h4>Use</h4>
+<p>
+Connect <code>heatPortCon</code> to <code>heaPorAir</code> and <code>heatPortRad</code> to <code>heaPorRad</code>
+of a zone. In <a href=\"modelica://FastSmoothBuildings.Examples.TwoZones\">Examples.TwoZones</a> the input is the
+output of an <a href=\"modelica://FastSmoothBuildings.Controls.EmissionMonitored\">EmissionMonitored</a> control
+times 1500 W.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.HVAC</code>.</li>
+</ul>
+</html>"));
 end IdealHeatingCooling;

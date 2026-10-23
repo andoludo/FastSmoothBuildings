@@ -89,5 +89,101 @@ equation
       Text(extent={{-30,6},{-11,-5}}, textColor={0,0,0}, textString="air"),
       Text(extent={{-36,-11},{-11,-25}}, textColor={0,0,0}, textString="radiation"),
       Text(extent={{-52,-62},{-27,-76}}, textColor={0,0,0}, textString="surface"),
-      Text(extent={{-150,140},{150,100}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,140},{150,100}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Base class of the thermal zones: the heat balance of the room air, the long-wave exchange between the surfaces
+through a radiant star, the distribution of the transmitted solar radiation, infiltration, scheduled outdoor air and
+internal gains. Each surface connects to an element of <code>propsBus</code>. An extending class gives
+<code>QVen</code>, the heat brought by a ventilation system.
+</p>
+<h4>Equations</h4>
+<p>
+<b>Long-wave exchange.</b> Each surface <i>i</i> of emissivity <i>&epsilon;<sub>i</sub></i>, area
+<i>A<sub>i</sub></i> and temperature <i>T<sub>i</sub></i> exchanges with a radiant star through
+</p>
+<p>
+<i>G<sub>i</sub></i> = 4 <i>&sigma;</i> <i>T<sub>Lin</sub></i><sup>3</sup> <i>&epsilon;<sub>i</sub></i>
+<i>A<sub>i</sub></i>, &nbsp;
+<i>T<sub>Rad</sub></i> = (&sum; <i>G<sub>i</sub></i> <i>T<sub>i</sub></i> + <i>Q<sub>Rad,emi</sub></i> +
+<i>A<sub>Flo</sub></i> <i>q<sub>Rad</sub></i>) / &sum; <i>G<sub>i</sub></i>,
+</p>
+<p>
+with <i>T<sub>Lin</sub></i> = <code>T0Rad</code> when <code>linearizeRadiation</code> is true, and otherwise the
+mean surface temperature weighted by <i>&epsilon;<sub>i</sub></i> <i>A<sub>i</sub></i>, explicit in the states of
+the surfaces. The radiant heat of the emitters (<code>heaPorRad</code>) and the radiant internal gains reach the
+surfaces in proportion to <i>&epsilon;<sub>i</sub></i> <i>A<sub>i</sub></i>; <code>heaPorRad</code> is at the mean
+surface temperature &sum; <i>G<sub>i</sub></i> <i>T<sub>i</sub></i> / &sum; <i>G<sub>i</sub></i>.
+</p>
+<p>
+<b>Transmitted solar radiation.</b> With <i>a<sub>i</sub></i> and <i>&tau;<sub>i</sub></i> the solar absorptance
+and transmittance of the surfaces, each surface absorbs
+</p>
+<ul>
+<li>of the diffuse radiation the share <i>a<sub>i</sub></i> <i>A<sub>i</sub></i> / &sum;
+(<i>a<sub>j</sub></i> + <i>&tau;<sub>j</sub></i>) <i>A<sub>j</sub></i>;</li>
+<li>of the direct radiation, if the zone has floors: a floor <i>a<sub>i</sub></i> <i>A<sub>i</sub></i> /
+<i>A<sub>FloSur</sub></i>, and the other surfaces share what the floors reflect, in proportion to
+<i>a<sub>i</sub></i> <i>A<sub>i</sub></i> over the sum of (<i>a<sub>j</sub></i> + <i>&tau;<sub>j</sub></i>)
+<i>A<sub>j</sub></i> of the surfaces that are not floors; without floors, as the diffuse radiation.</li>
+</ul>
+<p>
+The heat to the radiation side of surface <i>i</i> is <i>G<sub>i</sub></i> (<i>T<sub>Rad</sub></i> &minus;
+<i>T<sub>i</sub></i>) plus its absorbed solar radiation.
+</p>
+<p>
+<b>Room air.</b> With <i>&rho;</i> = <i>p<sub>Atm</sub></i>/(<i>R<sub>Air</sub></i> <i>T<sub>Air</sub></i>) and
+<i>&#7745;<sub>Ven</sub></i> the scheduled outdoor air flow,
+</p>
+<p>
+<i>f<sub>mSen</sub></i> <i>&rho;</i> <i>c<sub>p</sub></i> <i>V</i> d<i>T<sub>Air</sub></i>/d<i>t</i> =
+&sum; <i>Q<sub>con,i</sub></i> + <i>Q<sub>Con,emi</sub></i> + <i>A<sub>Flo</sub></i> <i>q<sub>Con</sub></i> +
+(<i>&rho;</i> <i>V</i> <i>ACH</i>/3600 + <i>&#7745;<sub>Ven</sub></i>) <i>c<sub>p</sub></i>
+(<i>T<sub>DryBul</sub></i> &minus; <i>T<sub>Air</sub></i>) + <i>Q<sub>Ven</sub></i>,
+</p>
+<p>
+where <i>Q<sub>con,i</sub></i> is the convective heat of surface <i>i</i>, held at <i>T<sub>Air</sub></i>,
+<i>Q<sub>Con,emi</sub></i> the heat of <code>heaPorAir</code> and <i>q<sub>Con</sub></i>, <i>q<sub>Rad</sub></i>
+the internal gains per floor area. The infiltration is a volume flow of zone air at the pressure of the site;
+<i>&#7745;<sub>Ven</sub></i> is interpolated in <code>ventilationSchedule</code> by
+<a href=\"modelica://FastSmoothBuildings.Utilities.dayTable\">dayTable</a>, repeated daily.
+</p>
+<h4>Parameters</h4>
+<table summary=\"Parameters of PartialZone\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">
+<tr><th>Name</th><th>Default</th><th>Meaning</th></tr>
+<tr><td><code>nSurf</code></td><td>&nbsp;</td><td>number of surfaces</td></tr>
+<tr><td><code>AFlo</code>, <code>hRoo</code></td><td>&nbsp;</td><td>floor area and height</td></tr>
+<tr><td><code>V</code></td><td><code>AFlo</code> <code>hRoo</code></td><td>air volume</td></tr>
+<tr><td><code>ACH</code></td><td>0 1/h</td><td>air changes per hour by infiltration of outdoor air</td></tr>
+<tr><td><code>ventilationSchedule</code></td><td>[0, 0]</td>
+<td>outdoor air on top of the infiltration: time since midnight (s) and mass flow rate (kg/s); a step where the
+table repeats an instant</td></tr>
+<tr><td><code>mSenFac</code></td><td>1</td><td>factor for the sensible heat capacity of the air</td></tr>
+<tr><td><code>T_start</code></td><td>294.15 K</td><td>initial air temperature</td></tr>
+<tr><td><code>hConInt</code>, <code>hConExt</code></td><td>0</td>
+<td>fixed interior and exterior convection coefficients passed to the surfaces, 0 for the natural and the wind
+laws</td></tr>
+<tr><td><code>T0Rad</code></td><td>293.15 K</td><td>linearization temperature of the long-wave exchange</td></tr>
+<tr><td><code>linearizeRadiation</code></td><td>true</td>
+<td>linearise at <code>T0Rad</code>, or at the current mean surface temperature</td></tr>
+</table>
+<h4>Relation to Buildings</h4>
+<p>
+After <code>Buildings.ThermalZones.Detailed.MixedAir</code>. The radiant star is the exact equivalent of the
+linearized radiosity exchange of Buildings with view factors <i>A<sub>j</sub></i>/&sum; <i>A</i>; the transmitted
+solar radiation is distributed as in its <code>SolarRadiationExchange</code>; the infiltration is
+<i>ACH</i> <i>V</i> times the density of the zone air at the pressure of the site, as in Buildings.
+<code>linearizeRadiation</code> = true is the default of Buildings; false comes close to its exact exchange.
+</p>
+<h4>Use</h4>
+<p>
+Extended by <a href=\"modelica://FastSmoothBuildings.Zones.Zone\">Zone</a> (no ventilation system) and
+<a href=\"modelica://FastSmoothBuildings.Zones.VentilatedZone\">VentilatedZone</a> (supply and extract air).
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Zones</code>.</li>
+</ul>
+</html>"));
 end PartialZone;

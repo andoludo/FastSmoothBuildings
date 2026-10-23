@@ -34,5 +34,49 @@ equation
   propsBus_a.QTraDif = 0;
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={
       Ellipse(extent={{-100,100},{-68,68}}, lineColor={255,255,0}, fillColor={255,213,170},
-        fillPattern=FillPattern.Sphere)}));
+        fillPattern=FillPattern.Sphere)}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Exterior wall or roof: the conduction of
+<a href=\"modelica://FastSmoothBuildings.Envelope.PartialOpaque\">PartialOpaque</a> between the sun, the outdoor air
+and the sky on the outside and the room on the inside. The layer boundaries <code>T[1]</code> (outer surface) to
+<code>T[nLay + 1]</code> (room surface) are states.
+</p>
+<h4>Equations</h4>
+<p>
+Outer surface: <code>Q_a</code> = <i>Q<sub>sol</sub></i> &minus; <i>Q<sub>ext</sub></i>, with the absorbed sun
+</p>
+<p>
+<i>Q<sub>sol</sub></i> = <i>&alpha;<sub>a</sub></i> <i>A</i> (<i>H<sub>dir</sub></i> + <i>H<sub>dif</sub></i>),
+</p>
+<p>
+<i>&alpha;<sub>a</sub></i> = <code>absSol_a</code> of the construction and the irradiance from
+<a href=\"modelica://FastSmoothBuildings.BoundaryConditions.TiltedSurface\">TiltedSurface</a>, and the heat to the
+outdoor air and the sky <i>Q<sub>ext</sub></i> from
+<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.exteriorExchange\">exteriorExchange</a> (emissivity
+<code>absIR_a</code>; the natural convection coefficients of the outer face, which faces the other way, at the tilt
+&pi; &minus; <code>til</code>).
+</p>
+<p>
+Room surface: <code>Q_b</code> = <i>Q<sub>rad</sub></i> &minus; <i>Q<sub>int</sub></i>, with
+<i>Q<sub>rad</sub></i> the long-wave and solar radiation the zone gives to the surface (<code>propsBus_a.rad</code>)
+and <i>Q<sub>int</sub></i> the convection to the room air from
+<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.interiorConvection\">interiorConvection</a>.
+</p>
+<p>
+On the bus: the room face at <code>T[nLay + 1]</code>, emissivity <code>absIR_b</code>, solar absorptance
+<code>absSol_b</code>, no transmission.
+</p>
+<h4>Use</h4>
+<p>
+The walls and the roof of
+<a href=\"modelica://FastSmoothBuildings.Examples.FreeFloatingRoom\">Examples.FreeFloatingRoom</a>. The convection
+coefficients may be fixed by the zone (<code>hConExt</code>, <code>hConInt</code> on the bus).
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Envelope</code>.</li>
+</ul>
+</html>"));
 end OuterWall;

@@ -125,5 +125,141 @@ equation
       Line(points={{-17,48},{58,48}}, color={0,0,0}),
       Ellipse(extent={{-113,117},{-82,85}}, lineColor={255,255,0}, fillColor={255,213,170},
         fillPattern=FillPattern.Sphere),
-      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+A window of area <code>A</code>: the glazing of
+<a href=\"modelica://FastSmoothBuildings.Data.Glazing\">Data.Glazing</a> on the glass area
+<i>A<sub>gla</sub></i> = <i>A</i> (1 &minus; <code>frac</code>), with a temperature state per pane
+(<code>T[1]</code> outside to <code>T[nPan]</code> room side), the gas gaps at the temperatures of their panes, the
+angular optics of the glazing, an optional overhang and side fins, and a frame without capacity on the rest of the
+area.
+</p>
+<h4>Equations</h4>
+<p>
+Balance of pane <i>i</i>, of capacity <i>C<sub>i</sub></i> = <i>A<sub>gla</sub></i> <i>x<sub>i</sub></i>
+<i>d<sub>i</sub></i> <i>c<sub>i</sub></i> (<code>cGla</code> when the glazing gives no <i>c<sub>i</sub></i>):
+</p>
+<p>
+<i>C<sub>i</sub></i> d<i>T<sub>i</sub></i>/d<i>t</i> = <i>Q<sub>abs,i</sub></i> + <i>Q<sub>in,i</sub></i>
+&minus; <i>Q<sub>in,i+1</sub></i>,
+</p>
+<p>
+where <i>Q<sub>in,i</sub></i> flows inwards across interface <i>i</i>: <i>Q<sub>in,1</sub></i> =
+&minus;<i>Q<sub>ext</sub></i> from the outside, <i>Q<sub>in,nPan+1</sub></i> = <i>Q<sub>int</sub></i> &minus;
+<i>Q<sub>rad</sub></i> to the room (convection to the room air
+(<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.interiorConvection\">interiorConvection</a>) minus the
+radiation the zone gives to the inner pane), and between panes <i>i</i> and <i>i</i> + 1
+</p>
+<p>
+<i>Q<sub>in,i+1</sub></i> = <i>G<sub>gap,i</sub></i> <i>R<sub>gap0,i</sub></i> /
+(<i>R<sub>i</sub></i>/2 + 1/<i>h<sub>gap,i</sub></i> + <i>R<sub>i+1</sub></i>/2)
+(<i>T<sub>i</sub></i> &minus; <i>T<sub>i+1</sub></i>),
+</p>
+<p>
+with <i>R<sub>i</sub></i> = <i>x<sub>i</sub></i>/<i>k<sub>i</sub></i> the resistance of a pane and
+<i>h<sub>gap,i</sub></i> the conductance of the gap at the current temperatures of its panes
+(<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.gapConductance\">gapConductance</a>, with the height
+<code>hWin</code>). <i>R<sub>gap0,i</sub></i> is the resistance between the centres of the two panes at the
+reference state of EN 673 (mean 10 &deg;C, 15 K across the glazing) and <i>G<sub>gap,i</sub></i> =
+<i>A<sub>gla</sub></i>/<i>R<sub>gap0,i</sub></i>: the factor <i>G<sub>gap</sub></i> <i>R<sub>gap0</sub></i> is
+<i>A<sub>gla</sub></i>, and <i>G<sub>gap</sub></i> sets the scale of the exchange for a calibration.
+</p>
+<p>
+Outside, the outer pane exchanges with the outdoor air and with sky and ground
+(<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.skyExchange\">skyExchange</a>, emissivity
+<code>absIR_a</code>):
+</p>
+<p>
+<i>Q<sub>ext</sub></i> = <i>A<sub>gla</sub></i> (4 + 4 &radic;(<i>v</i><sup>2</sup> + 0.01))
+(<i>T<sub>1</sub></i> &minus; <i>T<sub>out</sub></i>) + <i>Q<sub>sky</sub></i>,
+</p>
+<p>
+<i>v</i> the wind speed. The frame conducts <i>Q<sub>fra</sub></i> = <i>G<sub>fra</sub></i>
+(<i>T<sub>air</sub></i> &minus; <i>T<sub>out</sub></i>) from the room air to the outdoor air, with
+<i>G<sub>fra</sub></i> = <i>A</i> <code>frac</code> / (1/<code>hFraExt</code> + 1/<code>UFra</code> +
+1/<code>hFraInt</code>).
+</p>
+<p>
+Optics: the transmittance and the absorptance of each pane for the direct sun are quartics in
+cos&nbsp;<i>&theta;</i>, fitted by least squares to the values of the glazing at 0, 10, ..., 90&deg;
+(<a href=\"modelica://FastSmoothBuildings.Utilities.polynomialFit\">polynomialFit</a>); the diffuse sun takes the
+hemispherical values. With <i>f<sub>sun</sub></i> the sunlit fraction of the glass and the irradiance
+<i>H<sub>dir</sub></i>, <i>H<sub>dif</sub></i> of
+<a href=\"modelica://FastSmoothBuildings.BoundaryConditions.TiltedSurface\">TiltedSurface</a>,
+</p>
+<p>
+<i>Q<sub>abs,i</sub></i> = <i>A<sub>gla</sub></i> (<i>f<sub>sun</sub></i> <i>H<sub>dir</sub></i>
+<i>&alpha;<sub>i</sub></i>(cos&nbsp;<i>&theta;</i>) + <i>H<sub>dif</sub></i> <i>&alpha;<sub>i,hem</sub></i>),
+&nbsp; <code>QTraDir</code> = <i>A<sub>gla</sub></i> <i>f<sub>sun</sub></i> <i>H<sub>dir</sub></i>
+<i>&tau;</i>(cos&nbsp;<i>&theta;</i>), &nbsp; <code>QTraDif</code> = <i>A<sub>gla</sub></i>
+<i>H<sub>dif</sub></i> <i>&tau;<sub>hem</sub></i>,
+</p>
+<p>
+cos&nbsp;<i>&theta;</i> bounded below by 0 with
+<a href=\"modelica://FastSmoothBuildings.Utilities.positivePart\">positivePart</a> (width 0.01). The transmitted
+sun goes to the zone through the bus, which sees the room face of the glazing with the emissivity
+<code>absIR_b</code>, the hemispherical absorptance of the inner pane and the hemispherical transmittance.
+</p>
+<h4>Shading</h4>
+<p>
+From the weather bus the window computes the solar altitude <i>&beta;</i> = asin(cos&nbsp;<i>&zeta;</i>), the
+angle <i>&gamma;</i> between the horizontal projection of the sun's rays and the normal,
+cos&nbsp;<i>&gamma;</i> = cos&nbsp;<i>&theta;</i>/cos&nbsp;<i>&beta;</i> (the relation of a vertical window), and
+the side of the sun. The sunlit fraction is
+</p>
+<table summary=\"Sunlit fraction of the window\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">
+<tr><th>Shading</th><th><i>f<sub>sun</sub></i></th></tr>
+<tr><td>none</td><td>1</td></tr>
+<tr><td><code>haveOverhang</code></td>
+<td><i>f<sub>ove</sub></i> from
+<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.overhangSunlitFraction\">overhangSunlitFraction</a>
+</td></tr>
+<tr><td><code>haveSideFins</code></td>
+<td><i>f<sub>fin</sub></i> from
+<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.sideFinsSunlitFraction\">sideFinsSunlitFraction</a>
+</td></tr>
+<tr><td>both</td><td>smoothMax(<i>f<sub>ove</sub></i> + <i>f<sub>fin</sub></i> &minus; 1, 10<sup>&minus;3</sup>,
+5&middot;10<sup>&minus;4</sup>)</td></tr>
+</table>
+<p>
+Only the direct sun is shaded; the diffuse sun is not.
+</p>
+<h4>Parameters</h4>
+<ul>
+<li><code>frac</code>: the share of the frame in <code>A</code>; 0 by default, no frame.</li>
+<li><code>hWin</code>, <code>wWin</code>: the height and width of the window, <i>&radic;A</i> by default; the height
+enters the convection of the gaps (the aspect ratio of the cavity) and both enter the shading.</li>
+<li><code>haveOverhang</code>, <code>haveSideFins</code>: evaluated; a window without them keeps
+<i>f<sub>sun</sub></i> = 1 and none of the shading functions. The geometry (<code>depOve</code>,
+<code>gapOve</code>, <code>wLOve</code>, <code>wROve</code>, <code>depFin</code>, <code>gapFin</code>,
+<code>hFin</code>) is that of Buildings' <code>Overhang</code> and <code>SideFins</code>; left and right are seen
+from outside.</li>
+</ul>
+<h4>Relation to Buildings</h4>
+<p>
+The glazing data and its angular optics are those of Buildings
+(<code>Buildings.HeatTransfer.Data.GlazingSystems.Generic</code>), the gaps follow
+<code>Buildings.HeatTransfer.Windows.BaseClasses.GasConvection</code> (see
+<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.gapConductance\">gapConductance</a>), the overhang and
+the side fins <code>Buildings.HeatTransfer.Windows.BaseClasses.Overhang</code> and <code>SideFins</code> with
+smooth minima, maxima and steps, and both combine as Buildings combines them. As in Buildings, the diffuse sun is not
+shaded.
+</p>
+<h4>Validation</h4>
+<p>
+BESTEST cases 610, 630, 910 and 930 (overhangs, and overhangs with side fins): every result inside its band, within
+2.2 % of Buildings.
+</p>
+<h4>Use</h4>
+<p>
+The windows of <a href=\"modelica://FastSmoothBuildings.Examples.FreeFloatingRoom\">Examples.FreeFloatingRoom</a>
+and <a href=\"modelica://FastSmoothBuildings.Examples.TwoZones\">Examples.TwoZones</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Envelope</code>.</li>
+</ul>
+</html>"));
 end Window;

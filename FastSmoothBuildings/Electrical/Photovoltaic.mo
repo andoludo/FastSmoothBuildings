@@ -36,5 +36,35 @@ equation
         fillPattern=FillPattern.Solid, pattern=LinePattern.None),
       Polygon(points={{28,27},{40,53},{63,53},{52,27},{28,27}}, fillColor={6,13,150},
         fillPattern=FillPattern.Solid, pattern=LinePattern.None),
-      Text(extent={{-150,-104},{150,-64}}, textColor={0,0,0}, textString="%name")}));
+      Text(extent={{-150,-104},{150,-64}}, textColor={0,0,0}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Electrical power of a photovoltaic array of area <code>A</code>, azimuth <code>azi</code> and tilt <code>til</code>,
+proportional to the irradiance on its plane
+(<a href=\"modelica://FastSmoothBuildings.BoundaryConditions.TiltedSurface\">TiltedSurface</a>):
+</p>
+<p>
+<i>P</i> = <i>A</i> <i>f<sub>act</sub></i> <i>&eta;</i> <i>&eta;<sub>DC/AC</sub></i> (<i>H<sub>dir</sub></i> +
+<i>H<sub>dif</sub></i>),
+</p>
+<p>
+with the fraction of the area with active cells <code>fAct</code>, the module efficiency <code>eta</code> and the
+efficiency of the inverter <code>eta_DCAC</code>, all constant. The meter <code>EPro</code> integrates the
+production in kWh.
+</p>
+<h4>Relation to Buildings</h4>
+<p>
+The power of Buildings' <code>PVSimpleOriented</code>. The model has no electrical connector: the power is the
+variable <code>P</code>.
+</p>
+<h4>Use</h4>
+<p>
+<a href=\"modelica://FastSmoothBuildings.Examples.Photovoltaics\">Examples.Photovoltaics</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Electrical</code>.</li>
+</ul>
+</html>"));
 end Photovoltaic;

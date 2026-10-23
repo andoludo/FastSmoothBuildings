@@ -44,5 +44,65 @@ equation
       Rectangle(extent={{-70,78},{70,-80}}, lineColor={0,0,255}, pattern=LinePattern.None,
         fillColor={95,95,95}, fillPattern=FillPattern.Solid),
       Text(extent={{-56,-12},{54,-72}}, textColor={255,255,255}, textString="eps=%eps"),
-      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Air handling unit of a balanced ventilation (trano's system D): outdoor air through a heat recovery of constant
+effectiveness, warmed by constant-pressure fans, and the electricity of the fans metered. The unit is the reference
+of its air loop: it sets the speed <code>y</code> that the ducts downstream turn into their flows, and the supply
+air temperature.
+</p>
+<h4>Equations</h4>
+<p>
+Mixed extract air temperature, regularised by <code>m_flow_small</code> so that it is defined at zero flow (the
+mean of the port temperatures):
+</p>
+<p>
+<i>T<sub>Ext</sub></i> = (&sum; <i>&#7745;<sub>i</sub></i> <i>T<sub>i</sub></i> + <i>&#7745;<sub>small</sub></i>
+&sum; <i>T<sub>i</sub></i>/<i>n</i>) / (&sum; <i>&#7745;<sub>i</sub></i> + <i>&#7745;<sub>small</sub></i>).
+</p>
+<p>
+Supply air and fans:
+</p>
+<p>
+<i>T<sub>Sup</sub></i> = <i>T<sub>DryBul</sub></i> + <i>&epsilon;</i> (<i>T<sub>Ext</sub></i> &minus;
+<i>T<sub>DryBul</sub></i>) + <i>&Delta;T<sub>Fan</sub></i>, &nbsp;
+<i>P<sub>Fan</sub></i> = <i>y</i> (<i>P<sub>Sup</sub></i> + <i>P<sub>Ret</sub></i>), &nbsp;
+d<i>E<sub>Fan</sub></i>/d<i>t</i> = <i>P<sub>Fan</sub></i>/3.6&middot;10<sup>6</sup> (kWh),
+</p>
+<p>
+with the fan powers at nominal flow <i>P<sub>Sup</sub></i> = <i>&Delta;p<sub>Sup</sub></i>
+<i>&#7745;<sub>nominal</sub></i>/(<i>&rho;<sub>Air</sub></i> <i>&eta;<sub>Fan</sub></i>), likewise
+<i>P<sub>Ret</sub></i>, and the heating of the supply air by the fans (supply fan after the exchanger, return fan
+before it) <i>&Delta;T<sub>Fan</sub></i> = (<i>P<sub>Sup</sub></i> + <i>&epsilon;</i> <i>P<sub>Ret</sub></i>) /
+(<i>&#7745;<sub>nominal</sub></i> <i>c<sub>p</sub></i>). The power of constant-pressure fans and the flow are both
+proportional to <i>y</i>, so <i>&Delta;T<sub>Fan</sub></i> is the same at every speed.
+</p>
+<h4>Parameters</h4>
+<table summary=\"Parameters of HeatRecoveryUnit\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">
+<tr><th>Name</th><th>Default</th><th>Meaning</th></tr>
+<tr><td><code>m_flow_nominal</code></td><td>&nbsp;</td><td>nominal supply flow</td></tr>
+<tr><td><code>eps</code></td><td>0.8</td><td>heat recovery effectiveness</td></tr>
+<tr><td><code>dpSup_nominal</code>, <code>dpRet_nominal</code></td><td>200 Pa</td>
+<td>pressure rises of the supply and return fans</td></tr>
+<tr><td><code>etaFan</code></td><td>0.5</td><td>overall efficiency of the fans</td></tr>
+<tr><td><code>m_flow_small</code></td><td>10<sup>&minus;6</sup> kg/s</td>
+<td>regularisation of the mixed extract temperature</td></tr>
+<tr><td><code>nPorts_a</code>, <code>nPorts_b</code></td><td>1</td>
+<td>numbers of extract and supply connections</td></tr>
+</table>
+<h4>Use</h4>
+<p>
+Connect the weather to <code>weaBus</code>, the supply <code>port_b</code> through a
+<a href=\"modelica://FastSmoothBuildings.Ventilation.Duct\">Duct</a> to a
+<a href=\"modelica://FastSmoothBuildings.Zones.VentilatedZone\">Zones.VentilatedZone</a> and its extract back through
+another duct to <code>port_a</code>, as in
+<a href=\"modelica://FastSmoothBuildings.Examples.VentilatedRoom\">Examples.VentilatedRoom</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Ventilation</code>.</li>
+</ul>
+</html>"));
 end HeatRecoveryUnit;

@@ -11,5 +11,27 @@ connector GainInputs "Internal gains per floor area: inputs (from an occupancy s
       Ellipse(fillPattern=FillPattern.Solid, extent={{-5,15},{5,25}}),
       Ellipse(fillPattern=FillPattern.Solid, extent={{55,15},{65,25}}),
       Ellipse(fillPattern=FillPattern.Solid, extent={{-35,-25},{-25,-15}}),
-      Ellipse(fillPattern=FillPattern.Solid, extent={{25,-25},{35,-15}})}));
+      Ellipse(fillPattern=FillPattern.Solid, extent={{25,-25},{35,-15}})}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Internal gains per floor area as inputs, for instance from an occupancy schedule: <code>QCon</code>, convective,
+and <code>QRad</code>, radiant, in W/m<sup>2</sup>. Signals, not flow variables.
+</p>
+<p>
+The zone multiplies both by its floor area <code>AFlo</code>: <code>AFlo*QCon</code> enters the heat balance of the
+air, <code>AFlo*QRad</code> the radiant star, which shares it among the surfaces in proportion to
+<i>&epsilon;<sub>i</sub></i> <i>A<sub>i</sub></i> (see
+<a href=\"modelica://FastSmoothBuildings.Zones.PartialZone\">Zones.PartialZone</a>).
+</p>
+<h4>Use</h4>
+<p>
+The content of <a href=\"modelica://FastSmoothBuildings.Interfaces.OccupancyInputs\">OccupancyInputs</a>; the same
+variables as <a href=\"modelica://FastSmoothBuildings.Interfaces.Gains\">Gains</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Interfaces</code>.</li>
+</ul>
+</html>"));
 end GainInputs;
