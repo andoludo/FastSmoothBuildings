@@ -133,7 +133,7 @@ def strip_documentation(text: str) -> str:
         if before.endswith(","):
             before = before[:-1]
         elif after.startswith(","):
-            end = len(text) - len(after) + 1
+            end = len(text) - len(after[1:].lstrip())
         pieces.append(before)
         position = end
     pieces.append(text[position:])
