@@ -27,5 +27,39 @@ equation
   propsBus_a.QTraDif = 0;
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={
       Rectangle(extent={{-100,-80},{-80,-100}}, lineColor={127,0,0}, fillColor={127,0,0},
-        fillPattern=FillPattern.Backward)}));
+        fillPattern=FillPattern.Backward)}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Floor on the ground or over outdoor air: the conduction of
+<a href=\"modelica://FastSmoothBuildings.Envelope.PartialOpaque\">PartialOpaque</a> with the outer surface held at a
+temperature, the ground temperature <code>TGro</code> or, with <code>outdoorAir = true</code>, the outdoor dry-bulb
+temperature.
+</p>
+<h4>Equations</h4>
+<p>
+The outer surface (node 1) is not a state: its temperature is set and its balance is not solved
+(<code>Q_a</code> = 0, the heat to the ground is not computed). The other layer boundaries are states,
+<code>T[1]</code> to <code>T[nLay]</code> being the boundaries 2 to <code>nLay</code> + 1 of the construction; the
+room surface is <code>T[nLay]</code>.
+</p>
+<p>
+Room surface: <code>Q_b</code> = <i>Q<sub>rad</sub></i> &minus; <i>Q<sub>int</sub></i>, with
+<i>Q<sub>rad</sub></i> the radiation the zone gives to the surface and <i>Q<sub>int</sub></i> the convection to the
+room air (<a href=\"modelica://FastSmoothBuildings.Envelope.Functions.interiorConvection\">interiorConvection</a>).
+On the bus: emissivity <code>absIR_b</code>, solar absorptance <code>absSol_b</code>, no transmission.
+</p>
+<h4>Parameters</h4>
+<ul>
+<li><code>TGro</code>: a constant ground temperature, under the layers of the construction.</li>
+</ul>
+<h4>Use</h4>
+<p>
+The floors of <a href=\"modelica://FastSmoothBuildings.Examples.TwoZones\">Examples.TwoZones</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Envelope</code>.</li>
+</ul>
+</html>"));
 end BoundaryWall;

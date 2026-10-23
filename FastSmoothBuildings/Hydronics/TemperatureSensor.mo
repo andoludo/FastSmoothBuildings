@@ -21,5 +21,28 @@ equation
       Line(points={{-12,60},{-12,-25}}, thickness=0.5),
       Line(points={{12,60},{12,-24}}, thickness=0.5),
       Line(points={{0,100},{0,50}}, color={0,0,127}),
-      Text(extent={{-150,-110},{150,-150}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,-110},{150,-150}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+A pass-through that measures the water temperature: <code>T</code> = <code>TOut</code> = <code>TIn</code>, the
+mixed inlet temperature, without delay.
+</p>
+<h4>Set flows and pressure-driven flows</h4>
+<p>
+With set flows, what enters leaves. With pressure-driven flows, each outlet has the small linear resistance of
+<a href=\"modelica://FastSmoothBuildings.Hydronics.PartialLink\">PartialLink</a>: <code>dpLink</code> at the
+nominal flow <code>m_flow_nominal</code>, which should be the flow of the branch the sensor sits in.
+</p>
+<h4>Use</h4>
+<p>
+The supply temperature of a circuit, read by the controller of a
+<a href=\"modelica://FastSmoothBuildings.Hydronics.ThreeWayValve\">ThreeWayValve</a>, as in
+<a href=\"modelica://FastSmoothBuildings.Examples.BoilerCircuit\">Examples.BoilerCircuit</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Hydronics</code>.</li>
+</ul>
+</html>"));
 end TemperatureSensor;

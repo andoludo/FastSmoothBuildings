@@ -82,5 +82,76 @@ equation
         fillPattern=FillPattern.Solid),
       Polygon(points={{-44,2},{-54,12},{-34,12},{-44,2}}, lineColor={0,0,0}, fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
-      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Air-to-water heat pump at the compressor speed <code>y</code>, its performance from the table of the Viessmann
+Vitocal 251-A08
+(<a href=\"modelica://FastSmoothBuildings.Hydronics.HeatPumps.Vitocal251A08\">HeatPumps.Vitocal251A08</a>)
+scaled to <code>Q_flow_nominal</code>. It charges a mixed buffer at the temperature <code>T</code>, a storage tank
+or a hydraulic separator, from which the heating circuit draws at <code>T</code>. The source is the outdoor air of
+the weather bus.
+</p>
+<h4>Equations</h4>
+<p>
+With <i>Q<sub>tab</sub></i> and <i>P<sub>tab</sub></i> the heating capacity and electrical power of the table, as
+<a href=\"modelica://FastSmoothBuildings.Hydronics.HeatPumps.Vitocal251A08.smoothTable\">smoothTable</a> gives
+them at the condenser outlet temperature and the outdoor dry-bulb temperature <i>T<sub>sou</sub></i>:
+</p>
+<p>
+<i>T<sub>con,out</sub></i> = <i>T</i> + <code>dTCon</code> <i>y</i>,
+</p>
+<p>
+<i>Q<sub>con</sub></i> = <i>y</i> <i>s</i> <i>Q<sub>tab</sub></i>(<i>T<sub>con,out</sub></i>,
+<i>T<sub>sou</sub></i>), &nbsp; <i>P<sub>ele</sub></i> = <i>y</i> <i>s</i>
+<i>P<sub>tab</sub></i>(<i>T<sub>con,out</sub></i>, <i>T<sub>sou</sub></i>), &nbsp;
+<code>COP</code> = <i>Q<sub>tab</sub></i>/<i>P<sub>tab</sub></i>,
+</p>
+<p>
+<i>C</i> d<i>T</i>/d<i>t</i> = <code>mTra</code> <i>c<sub>p</sub></i> (<code>TIn</code> &minus; <i>T</i>) +
+<i>Q<sub>con</sub></i> + <code>UA</code> (<code>TAmb</code> &minus; <i>T</i>).
+</p>
+<p>
+Both <i>Q<sub>con</sub></i> and <i>P<sub>ele</sub></i> scale with <i>y</i>, so the <code>COP</code> is defined at
+every speed, also with the compressor off. The electricity meter <code>EEle</code> integrates
+<i>P<sub>ele</sub></i> in kWh.
+</p>
+<h4>Parameters</h4>
+<ul>
+<li><code>scaFac</code> (<i>s</i>): <code>Q_flow_nominal</code> over the capacity of the table at the supply
+temperature <code>TSet</code> and the outdoor temperature <code>TOutDes</code>, by the linear interpolation of
+<a href=\"modelica://FastSmoothBuildings.Hydronics.HeatPumps.Vitocal251A08.interpolate\">interpolate</a>.</li>
+<li><code>mCon_flow</code>: the condenser flow of the record scaled by <code>scaFac</code>;
+<code>dTCon</code> = <code>Q_flow_nominal</code>/(<i>c<sub>p</sub></i> <code>mCon_flow</code>), the rise of the
+condenser outlet above the buffer at full speed.</li>
+<li><code>useStorageTank</code>: with a tank, the water volume is <code>VTan</code> and the heat loss conductance
+that of a cylinder of volume <code>VTan</code> and height <code>hTan</code> (side and both ends) insulated by
+<code>dIns</code> of conductivity <code>kIns</code>; without, a hydraulic separator without loss, of
+1.5&middot;10<sup>&minus;5</sup> m<sup>3</sup> per W of <code>Q_flow_nominal</code>.</li>
+<li><code>C</code>: heat capacity of the buffer water and of the water in the condenser, taken as
+<code>mCon_flow</code> <code>tauCon</code>.</li>
+<li><code>dTSou</code>: width over which the kinks of the table in the source temperature are smoothed.</li>
+</ul>
+<h4>Set flows and pressure-driven flows</h4>
+<p>
+With set flows, the heat pump is the reference of its circuit: it has no mass balance, the circuit closes it. With
+pressure-driven flows, its outlets have the small linear conductance <code>m_flow_nominal</code>/<code>dpLink</code>,
+shared evenly by the outlet connections; the heating side of Buildings has no resistance.
+</p>
+<h4>Relation to Buildings</h4>
+<p>
+<code>Buildings.Fluid.HeatPumps.ModularReversible.AirToWaterTableData2D</code> with the Vitocal 251-A08 data,
+scaled to its capacity.
+</p>
+<h4>Use</h4>
+<p>
+<a href=\"modelica://FastSmoothBuildings.Examples.HeatPumpCircuit\">Examples.HeatPumpCircuit</a>: a buffer and two
+radiators in closed loop.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Hydronics</code>.</li>
+</ul>
+</html>"));
 end HeatPump;

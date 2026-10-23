@@ -95,5 +95,78 @@ equation
       Text(extent={{-98,-2},{-60,-18}}, textColor={0,0,0}, textString="HDirNor"),
       Text(extent={{-98,-22},{-60,-38}}, textColor={0,0,0}, textString="HDifHor"),
       Text(extent={{-98,-42},{-60,-58}}, textColor={0,0,0}, textString="HGloHor"),
-      Text(extent={{-150,140},{150,100}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,140},{150,100}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+The weather bus of a model: the weather data, given as inputs (the top-level inputs of the CasADi model), with the
+site, the solar position and the coefficients of the Perez sky model computed from them, without table or event.
+</p>
+<h4>Equations</h4>
+<p>
+Solar position, with <i>t</i> the model time in seconds, the standard clock time from the beginning of the year:
+</p>
+<ul>
+<li>declination <i>&delta;</i> = asin(&minus;sin&nbsp;23.45&deg; cos(2&pi; (<i>t</i>/86400 + 10)/365.25));</li>
+<li>equation of time <i>E</i> = 60 (9.87 sin&nbsp;2<i>B</i> &minus; 7.53 cos&nbsp;<i>B</i> &minus; 1.5
+sin&nbsp;<i>B</i>) s, <i>B</i> = &pi; ((<i>t</i> + 86400)/86400 &minus; 81)/182;</li>
+<li>solar time <i>t<sub>sol</sub></i> = <i>t</i> &minus; <code>timZon</code> + <code>lon</code> 43200/&pi; +
+<i>E</i>, hour angle <i>&omega;</i> = 2&pi; (<i>t<sub>sol</sub></i>/3600 &minus; 12)/24;</li>
+<li>cos&nbsp;<i>&zeta;</i> = cos&nbsp;<i>&phi;</i> cos&nbsp;<i>&delta;</i> cos&nbsp;<i>&omega;</i> +
+sin&nbsp;<i>&phi;</i> sin&nbsp;<i>&delta;</i>.</li>
+</ul>
+<p>
+Perez model, with <i>&zeta;</i> the zenith angle:
+</p>
+<ul>
+<li>relative air mass <i>m</i> = exp(&minus;0.0001184 <code>alt</code>) / (cos&nbsp;<i>&zeta;'</i> + 0.15
+(93.9 &minus; <i>&zeta;'</i>)<sup>&minus;1.253</sup>), <i>&zeta;'</i> = min(<i>&zeta;</i>, 90&deg;), in degrees
+in the second term;</li>
+<li>sky brightness <i>&Delta;</i> = min(<i>H<sub>dif,hor</sub></i> <i>m</i> / (1366.1 (1 + 0.033
+cos(2&pi; (<i>t<sub>sol</sub></i>/86400 + 1)/365))), 1);</li>
+<li>sky clearness <i>&epsilon;</i> = ((<i>H<sub>dir,nor</sub></i> + <i>H<sub>dif,hor</sub></i>) /
+<i>H<sub>dif,hor</sub></i> + <i>&kappa;</i> <i>&zeta;</i><sup>3</sup>) / (1 + <i>&kappa;</i>
+<i>&zeta;</i><sup>3</sup>), <i>&kappa;</i> = 5.534&middot;10<sup>&minus;6</sup> (<i>&zeta;</i> in degrees),
+limited to [1, 8];</li>
+<li>with <i>a<sub>k</sub></i> the weight of the clearness bin <i>k</i> of eight (edges 1.065, 1.23, 1.50, 1.95,
+2.80, 4.50 and 6.20) and <i>&zeta;</i> in radians,
+<i>F<sub>1</sub></i> = max(0, &Sigma;<sub><i>k</i></sub> <i>a<sub>k</sub></i> (<i>F<sub>11,k</sub></i> +
+<i>F<sub>12,k</sub></i> <i>&Delta;</i> + <i>F<sub>13,k</sub></i> <i>&zeta;</i>)),
+<i>F<sub>2</sub></i> = &Sigma;<sub><i>k</i></sub> <i>a<sub>k</sub></i> (<i>F<sub>21,k</sub></i> +
+<i>F<sub>22,k</sub></i> <i>&Delta;</i> + <i>F<sub>23,k</sub></i> <i>&zeta;</i>).</li>
+</ul>
+<h4>Smoothing</h4>
+<p>
+Each bin weight is the difference of two <a href=\"modelica://FastSmoothBuildings.Utilities.regStep\">regStep</a>
+over 0.01 at its edges: the weights sum to 1 and pass from one bin to the next continuously. The minima, maxima and
+limits are smooth (<a href=\"modelica://FastSmoothBuildings.Utilities.smoothMin\">smoothMin</a>,
+<a href=\"modelica://FastSmoothBuildings.Utilities.smoothMax\">smoothMax</a>,
+<a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimitInside\">smoothLimitInside</a>), and
+<i>H<sub>dif,hor</sub></i> is bounded below by 0.5&middot;10<sup>&minus;4</sup> W/m<sup>2</sup> in the clearness.
+</p>
+<h4>Parameters</h4>
+<ul>
+<li><code>lat</code>, <code>lon</code>, <code>timZon</code>: the site and its time zone, Uccle by default.</li>
+<li><code>alt</code>: the altitude of the site, in the relative air mass.</li>
+<li><code>pAtm</code>: the atmospheric pressure on the bus, constant, the default of Buildings; the runnable model
+takes the pressure of the altitude of the site when the YAML reads the pressure from the weather file.</li>
+</ul>
+<h4>Relation to Buildings</h4>
+<p>
+The solar position of <code>Buildings.BoundaryConditions.SolarGeometry</code> and the Perez coefficients of
+<code>Buildings.BoundaryConditions.SolarIrradiation.BaseClasses</code>.
+</p>
+<h4>Use</h4>
+<p>
+<a href=\"modelica://FastSmoothBuildings.BoundaryConditions.TiltedSurface\">TiltedSurface</a> computes the
+irradiance on each surface from its bus;
+<a href=\"modelica://FastSmoothBuildings.Examples.BaseClasses.SyntheticWeather\">
+Examples.BaseClasses.SyntheticWeather</a>
+gives it clear days.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.BoundaryConditions</code>.</li>
+</ul>
+</html>"));
 end Weather;

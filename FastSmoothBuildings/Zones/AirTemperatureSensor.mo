@@ -10,5 +10,24 @@ equation
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={
       Ellipse(extent={{-20,-80},{20,-40}}, lineColor={0,0,0}, fillColor={191,0,0}, fillPattern=FillPattern.Solid),
       Rectangle(extent={{-12,60},{12,-44}}, lineColor={0,0,0}, fillColor={191,0,0}, fillPattern=FillPattern.Solid),
-      Text(extent={{-150,140},{150,100}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,140},{150,100}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+The air temperature of a zone as a signal, for the data bus or a controller, without heat flow.
+</p>
+<h4>Equations</h4>
+<p>
+<code>port.Q_flow</code> = 0, &nbsp; <code>T</code> = <code>port.T</code>.
+</p>
+<h4>Use</h4>
+<p>
+Connect <code>port</code> to <code>heaPorAir</code> of a zone. See
+<a href=\"modelica://FastSmoothBuildings.Examples.TwoZones\">Examples.TwoZones</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Zones</code>.</li>
+</ul>
+</html>"));
 end AirTemperatureSensor;

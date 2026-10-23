@@ -60,6 +60,33 @@ jobs:
       - run: uv sync --locked --no-default-groups --group test
       - run: uv run pytest -m openmodelica
 
+  study:
+    # the study against Buildings with the models trano generates: its types and its tests, without simulating
+    runs-on: ubuntu-latest
+    env:
+      UV_NO_SYNC: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked --group study
+      - run: uv run mypy --config-file study/mypy.ini
+      - run: uv run pytest tests/study
+
+  docs:
+    runs-on: ubuntu-latest
+    env:
+      UV_NO_SYNC: "1"
+      DISABLE_MKDOCS_2_WARNING: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --locked --no-default-groups --group docs
+      - run: uv run mkdocs build --strict
+
   build:
     runs-on: ubuntu-latest
     steps:

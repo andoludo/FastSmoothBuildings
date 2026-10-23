@@ -52,5 +52,63 @@ equation
         fillPattern=FillPattern.Solid),
       Rectangle(extent={{40,6},{60,-6}}, lineColor={0,0,0}, lineThickness=0.5, fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
-      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Conduction through the layers of an opaque construction
+(<a href=\"modelica://FastSmoothBuildings.Data.Construction\">Data.Construction</a>), from side <i>a</i> (outside) to
+side <i>b</i> (room). Layer <i>l</i> is split into <code>nSta[l]</code> sublayers of equal thickness, with a node at
+each sublayer boundary: <code>nSub</code> = <code>nNod</code> sublayers between <code>nSub</code> + 1 nodes, outside
+first.
+</p>
+<h4>Equations</h4>
+<p>
+Sublayer <i>j</i> of layer <i>l</i> = <code>lay[j]</code> has the thickness
+<i>x<sub>j</sub></i> = <i>x<sub>l</sub></i>/<i>nSta<sub>l</sub></i>, the conductance
+<i>G<sub>j</sub></i> = <i>A</i> <i>k<sub>j</sub></i>/<i>x<sub>j</sub></i>, and gives half of its capacity to each
+of its two nodes:
+</p>
+<p>
+<i>C<sub>i</sub></i> = <i>A</i> (<i>x<sub>i&minus;1</sub></i> <i>d<sub>i&minus;1</sub></i>
+<i>c<sub>i&minus;1</sub></i> + <i>x<sub>i</sub></i> <i>d<sub>i</sub></i> <i>c<sub>i</sub></i>)/2,
+</p>
+<p>
+the terms of a sublayer that does not exist left out at the surfaces. The heat into node <i>i</i> is
+</p>
+<p>
+<i>Q<sub>i</sub></i> = <i>G<sub>i&minus;1</sub></i> (<i>T<sub>i&minus;1</sub></i> &minus; <i>T<sub>i</sub></i>)
+&minus; <i>G<sub>i</sub></i> (<i>T<sub>i</sub></i> &minus; <i>T<sub>i+1</sub></i>),
+</p>
+<p>
+with <code>Q_a</code>, the heat into the outer surface from the outside, in place of the first term at node 1, and
+<code>Q_b</code>, the heat into the inner surface from the room, in place of the second term at the last node. Each
+node inside a layer, <code>sub[m]</code>, has the state <code>TSub[m]</code>:
+<i>C</i> d<code>TSub[m]</code>/d<i>t</i> = <i>Q</i>.
+</p>
+<h4>Extending classes</h4>
+<p>
+They declare the temperatures <code>T</code> of the layer boundaries (nodes <code>nod[b]</code>), with
+<i>C</i> d<i>T</i>/d<i>t</i> = <i>Q</i> at each node whose temperature is free, and give <code>Q_a</code> and
+<code>Q_b</code> from the exchanges at the two faces. <code>T</code> and <code>TSub</code> keep their names and
+places whatever the number of sublayers: with one sublayer a layer (the model for optimal control) there is no
+<code>TSub</code> (see <a href=\"modelica://FastSmoothBuildings.UsersGuide.Conventions\">Conventions</a>).
+</p>
+<h4>Parameters</h4>
+<ul>
+<li><code>stateAtSurface_a</code>: <code>true</code> when the outer surface has a capacity and a state;
+<a href=\"modelica://FastSmoothBuildings.Envelope.BoundaryWall\">BoundaryWall</a>, whose outer surface is held at a
+temperature, sets it to <code>false</code>.</li>
+</ul>
+<h4>Relation to Buildings</h4>
+<p>
+The layers are split into the sublayers Buildings gives them (<code>nSta</code> of
+<code>Buildings.HeatTransfer.Data.OpaqueConstructions.Generic</code>), at most three a layer in the closed-loop
+model.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Envelope</code>.</li>
+</ul>
+</html>"));
 end PartialOpaque;

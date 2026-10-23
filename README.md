@@ -13,6 +13,9 @@ as **smooth, event-free, explicit ordinary differential equations**:
 
 It has no dependency, not even the Modelica Standard Library, and runs in OpenModelica, Dymola and rumoca alike.
 
+**Documentation**: <https://andoludo.github.io/FastSmoothBuildings/>: the guide, a page per class, the validation
+against Buildings and the analysis behind the library.
+
 The library was developed as the `FastModel` package of [trano](https://github.com/andoludo/trano), which generates
 its models from a YAML description of a building; its history is in this repository. In trano's validation, the
 models it generates pass the 27 cases of ASHRAE Standard 140 (BESTEST), with heating and cooling loads within 1.1 %
@@ -99,6 +102,10 @@ The OpenModelica tests run the examples in the official image `openmodelica/open
 compare them with `FastSmoothBuildings/Resources/ReferenceResults/OpenModelica`; `uv run pytest -m openmodelica
 --update-references` rewrites the references after a deliberate change. The rumoca tests integrate the CasADi models
 and compare them with the same references, without Docker.
+
+The study against Buildings (`study/`) runs the models trano generates with both libraries in OpenModelica
+(`uv sync --group study`, Docker); its results are committed and rendered on the documentation site, which
+`uv sync --group docs && uv run mkdocs serve` builds locally. See [Development](docs/development.md).
 
 ### Releasing
 

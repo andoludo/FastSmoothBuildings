@@ -16,5 +16,32 @@ equation
       Rectangle(extent={{-100,-100},{100,100}}, lineColor={0,0,127}, fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
       Text(extent={{-90,40},{90,-40}}, textColor={0,0,0}, textString="P"),
-      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Emission control of a zone, trano's variant <code>MonitoredSetpoint</code>: a proportional controller between 0 and
+1 (the IDEAS <code>LimPID</code> of trano's model) towards a set point given as an input (read from external
+data), instead of the schedule of
+<a href=\"modelica://FastSmoothBuildings.Controls.PartialEmissionControl\">PartialEmissionControl</a>.
+</p>
+<h4>Equations</h4>
+<p>
+<i>y</i> = smoothLimit(<i>k</i> (<i>T<sub>Set</sub></i> &minus; <i>T<sub>Zon</sub></i>), 0, 1, <i>dY</i>), exactly
+0 and 1 beyond the blends of <a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimit\">smoothLimit</a>.
+</p>
+<h4>Parameters</h4>
+<p>
+<code>k</code> = 1 and <code>dY</code> = 10<sup>&minus;3</sup>, the half-width of the smooth limits.
+</p>
+<h4>Use</h4>
+<p>
+Sets the power of the ideal heating of the east room of
+<a href=\"modelica://FastSmoothBuildings.Examples.TwoZones\">Examples.TwoZones</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Controls</code>.</li>
+</ul>
+</html>"));
 end EmissionMonitored;

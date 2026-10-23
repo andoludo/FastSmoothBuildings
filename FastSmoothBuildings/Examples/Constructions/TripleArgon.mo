@@ -22,4 +22,21 @@ record TripleArgon = FastSmoothBuildings.Data.Glazing (
     0.03882445486, 0, 0.07977967349}},
   absIR_a=0.84,
   absIR_b=0.84,
-  UFra=1.4) "Triple glazing with argon and two low-emissivity coatings";
+  UFra=1.4) "Triple glazing with argon and two low-emissivity coatings"
+  annotation (Documentation(info="<html>
+<p>
+A triple glazing with argon, a <a href=\"modelica://FastSmoothBuildings.Data.Glazing\">Data.Glazing</a>: three panes
+of 6 mm (<i>k</i> = 1 W/(m K)) around two gaps of
+16 mm of argon. Two low-emissivity coatings (0.04), on the inner face of the outer pane and the outer face of the
+inner pane; the other faces 0.84. Solar transmittance 0.356 at normal incidence, 0.258 hemispherical; frame
+transmittance 1.4 W/(m<sup>2</sup> K).
+</p>
+<p>
+The windows of the hydronic examples and of
+<a href=\"modelica://FastSmoothBuildings.Examples.TwoZones\">TwoZones</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: first version.</li>
+</ul>
+</html>"));

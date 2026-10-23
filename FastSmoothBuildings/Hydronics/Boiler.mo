@@ -54,5 +54,80 @@ equation
         fillPattern=FillPattern.Solid, lineColor={0,0,0}),
       Line(points={{-100,80},{-80,80},{-80,-44},{-6,-44}}),
       Text(extent={{-38,146},{-158,96}}, textColor={0,0,0}, textString="y"),
-      Text(extent={{-150,-110},{150,-150}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,-110},{150,-150}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Boiler fired at the part load ratio <code>y</code>: a single node of water and metal at the temperature
+<code>T</code>, heated by the fuel and losing heat to the boiler room. The water leaves at <code>T</code>.
+</p>
+<h4>Equations</h4>
+<p>
+Fuel power and efficiency, the coefficients <code>a</code> padded with zeros to six:
+</p>
+<p>
+<i>Q<sub>fue</sub></i> = <i>y</i> <code>Q_flow_nominal</code> / <i>&eta;<sub>nom</sub></i>,
+</p>
+<table summary=\"Efficiency curves of the boiler\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">
+<tr><th><code>effCur</code></th><th><i>&eta;</i></th><th><i>&eta;<sub>nom</sub></i></th></tr>
+<tr><td><code>QuadraticLinear</code></td>
+<td><i>a<sub>1</sub></i> + <i>a<sub>2</sub></i> <i>y</i> + <i>a<sub>3</sub></i> <i>y</i><sup>2</sup> +
+(<i>a<sub>4</sub></i> + <i>a<sub>5</sub></i> <i>y</i> + <i>a<sub>6</sub></i> <i>y</i><sup>2</sup>) <i>T</i></td>
+<td><i>&eta;</i> at <i>y</i> = 1 and <i>T</i> = <code>T_nominal</code></td></tr>
+<tr><td><code>Constant</code>, <code>Polynomial</code></td>
+<td><i>a<sub>1</sub></i> + <i>a<sub>2</sub></i> <i>y</i> + &hellip; + <i>a<sub>6</sub></i>
+<i>y</i><sup>5</sup></td>
+<td><i>&eta;</i> at <i>y</i> = 1</td></tr>
+</table>
+<p>
+Energy balance of the water and metal, with the heat capacity <i>C</i> = <i>&rho;</i> <code>VWat</code>
+<i>c<sub>p</sub></i> + 500 J/(kg K) <code>mDry</code>:
+</p>
+<p>
+<i>Q<sub>wat</sub></i> = <i>&eta;</i> <i>Q<sub>fue</sub></i> + <code>UA</code> (<code>TAmb</code> &minus;
+<i>T</i>), &nbsp;
+<i>C</i> d<i>T</i>/d<i>t</i> = <code>mTra</code> <i>c<sub>p</sub></i> (<code>TIn</code> &minus; <i>T</i>) +
+<i>Q<sub>wat</sub></i>.
+</p>
+<p>
+The fuel meter <code>EFue</code> integrates <i>Q<sub>fue</sub></i> in kWh: a state, exact whatever the output
+interval.
+</p>
+<h4>Set flows and pressure-driven flows</h4>
+<p>
+With set flows, the boiler is the reference of its circuit: it has no mass balance, the circuit closes it, and its
+flows are set by the valves. With pressure-driven flows, each of the <i>n<sub>b</sub></i> outlets passes the flow
+of a quadratic resistance, <code>port_b[j].m_flow</code> =
+&minus;<a href=\"modelica://FastSmoothBuildings.Utilities.quadraticFlow\">quadraticFlow</a>(<i>p<sub>in</sub></i>
+&minus; <i>p<sub>b,j</sub></i>, <code>m_flow_nominal</code>/<i>n<sub>b</sub></i>, <code>dp_nominal</code>,
+<code>deltaM</code>), regularized below <code>deltaM</code> times the nominal flow.
+</p>
+<h4>Parameters</h4>
+<ul>
+<li><code>UA</code>: heat loss conductance to the boiler room, twice 10<sup>&minus;4</sup>
+<code>Q_flow_nominal</code> by default, because <code>BoilerPolynomial</code> of Buildings 13 counts its loss
+twice.</li>
+<li><code>m_flow_nominal</code>: by default the flow that carries <code>Q_flow_nominal</code> with a 20 K
+temperature difference; used with pressure-driven flows only.</li>
+<li><code>VWat</code>, <code>mDry</code>: water volume and dry mass, by default proportional to
+<code>Q_flow_nominal</code>.</li>
+</ul>
+<h4>Relation to Buildings</h4>
+<p>
+<code>Buildings.Fluid.Boilers.BoilerPolynomial</code>, with the efficiency curves of
+<a href=\"modelica://FastSmoothBuildings.Types\">Types.EfficiencyCurves</a>. Buildings 13 injects
+<i>&eta;</i> <i>Q<sub>fue</sub></i> and the heat flow of its loss conductance into the water, then conducts that
+loss out of the water again: the loss counts twice, which the doubled <code>UA</code> reproduces.
+</p>
+<h4>Use</h4>
+<p>
+Fired by
+<a href=\"modelica://FastSmoothBuildings.Controls.BoilerTemperatureControl\">Controls.BoilerTemperatureControl</a>
+in <a href=\"modelica://FastSmoothBuildings.Examples.BoilerCircuit\">Examples.BoilerCircuit</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Hydronics</code>.</li>
+</ul>
+</html>"));
 end Boiler;

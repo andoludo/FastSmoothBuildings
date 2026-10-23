@@ -65,5 +65,66 @@ equation
       Line(points={{-66,-30},{66,-30}}),
       Line(points={{-66,60},{-66,-60}}),
       Line(points={{66,60},{66,-60}}),
-      Text(extent={{-150,-110},{150,-150}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,-110},{150,-150}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Radiator after EN 442: <code>nEle</code> elements of water and metal in series, each giving heat to the room air
+(<code>heatPortCon</code>) and to the room surfaces (<code>heatPortRad</code>) by the power law of EN 442.
+</p>
+<h4>Equations</h4>
+<p>
+For element <i>i</i> at the water temperature <i>T<sub>i</sub></i>, with <i>UA</i> = <code>UAEle</code>,
+<i>f</i> = <code>fraRad</code>, <i>n</i> the exponent and <i>&delta;</i> = <code>dT0</code>:
+</p>
+<p>
+<i>Q<sub>con,i</sub></i> = (1 &minus; <i>f</i>) <i>UA</i> &Delta;<i>T<sub>con</sub></i>
+(&Delta;<i>T<sub>con</sub></i><sup>2</sup> + <i>&delta;</i><sup>2</sup>)<sup>(<i>n</i> &minus; 1)/2</sup>,
+&nbsp; &Delta;<i>T<sub>con</sub></i> = <i>T<sub>i</sub></i> &minus; <i>T<sub>air</sub></i>,
+</p>
+<p>
+<i>Q<sub>rad,i</sub></i> = <i>f</i> <i>UA</i> &Delta;<i>T<sub>rad</sub></i>
+(&Delta;<i>T<sub>rad</sub></i><sup>2</sup> + <i>&delta;</i><sup>2</sup>)<sup>(<i>n</i> &minus; 1)/2</sup>,
+&nbsp; &Delta;<i>T<sub>rad</sub></i> = <i>T<sub>i</sub></i> &minus; <i>T<sub>surf</sub></i>,
+</p>
+<p>
+(<i>C</i>/<code>nEle</code>) d<i>T<sub>i</sub></i>/d<i>t</i> = <code>mTra</code> <i>c<sub>p</sub></i>
+(<i>T<sub>i&minus;1</sub></i> &minus; <i>T<sub>i</sub></i>) &minus; <i>Q<sub>con,i</sub></i> &minus;
+<i>Q<sub>rad,i</sub></i>,
+</p>
+<p>
+with <i>T<sub>0</sub></i> = <code>TIn</code>; the water leaves at the temperature of the last element,
+<code>TOut</code> = <i>T</i><sub><code>nEle</code></sub>. Far from &Delta;<i>T</i> = 0 the law is
+&Delta;<i>T</i> |&Delta;<i>T</i>|<sup><i>n</i> &minus; 1</sup>; around it, it is linear, its slope
+<i>&delta;</i><sup><i>n</i> &minus; 1</sup> times the conductance, so the derivative stays finite where that of the
+exact power law does not. A radiator colder than the room takes heat from it.
+</p>
+<p>
+The heat capacity <i>C</i> = <i>&rho;</i> <code>VWat</code> <i>c<sub>p</sub></i> + 500 J/(kg K)
+<code>mDry</code> is shared evenly by the elements. <code>UAEle</code> is computed by
+<a href=\"modelica://FastSmoothBuildings.Hydronics.radiatorConductance\">radiatorConductance</a> so that the
+radiator gives <code>Q_flow_nominal</code> at the nominal temperatures and at the nominal flow
+<code>m_flow_nominal</code> = |<code>Q_flow_nominal</code> / (<i>c<sub>p</sub></i> (<code>T_a_nominal</code>
+&minus; <code>T_b_nominal</code>))|.
+</p>
+<h4>Set flows and pressure-driven flows</h4>
+<p>
+With set flows, what enters leaves. With pressure-driven flows, the outlets have the linear conductance
+<code>m_flow_nominal</code>/<code>dp_nominal</code>, shared evenly by the outlet connections.
+</p>
+<h4>Relation to Buildings</h4>
+<p>
+<code>Buildings.Fluid.HeatExchangers.Radiators.RadiatorEN442_2</code>, its pressure drop linearized.
+</p>
+<h4>Use</h4>
+<p>
+Connect <code>heatPortCon</code> to the air and <code>heatPortRad</code> to the radiant node of a zone, and a
+<a href=\"modelica://FastSmoothBuildings.Hydronics.Valve\">Valve</a> in series, as in
+<a href=\"modelica://FastSmoothBuildings.Examples.BoilerCircuit\">Examples.BoilerCircuit</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Hydronics</code>.</li>
+</ul>
+</html>"));
 end Radiator;

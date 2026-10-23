@@ -25,4 +25,28 @@ algorithm
       y := row[r] + w*(row[r + 1] - row[r]);
     end if;
   end for;
+  annotation (Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Heating capacity (<code>heating = true</code>) or electrical power of the Vitocal 251-A08 at a condenser outlet
+temperature and a source temperature, by linear interpolation in the table: first along the source temperature
+<code>TSou</code> in each row, then along the condenser outlet temperature <code>TCon</code> between the rows.
+Beyond the first and last breakpoints of either axis the value is held at the edge of the table.
+</p>
+<h4>Use</h4>
+<p>
+The value of the table at design conditions, for the scaling <code>scaFac</code> of
+<a href=\"modelica://FastSmoothBuildings.Hydronics.HeatPump\">HeatPump</a>. It is evaluated from parameters only;
+the model itself uses the differentiable
+<a href=\"modelica://FastSmoothBuildings.Hydronics.HeatPumps.Vitocal251A08.smoothTable\">smoothTable</a>.
+</p>
+<h4>Relation to Buildings</h4>
+<p>
+Within the table, the linear interpolation of <code>CombiTable2Ds</code> (rows: condenser, columns: source).
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Hydronics.HeatPumps.Vitocal251A08</code>.</li>
+</ul>
+</html>"));
 end interpolate;

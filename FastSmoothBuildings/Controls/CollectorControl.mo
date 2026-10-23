@@ -22,5 +22,41 @@ equation
       Rectangle(extent={{-100,-100},{100,100}}, lineColor={0,0,127}, fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
       Text(extent={{-90,40},{90,-40}}, textColor={0,0,0}, textString="collector"),
-      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}));
+      Text(extent={{-150,150},{150,110}}, textColor={0,0,255}, textString="%name")}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+Control of the pump of a circuit (trano's <code>CollectorControl</code>): the pump is on when a valve of the circuit
+opens beyond 0.5 and off when all are below 0.01; while on, a proportional controller holds its head at the nominal
+head.
+</p>
+<h4>Equations</h4>
+<p>
+<i>y<sub>Max</sub></i> = smoothMaxN(<code>yVal</code>, <code>dMax</code>), &nbsp;
+<i>y</i> = smoothLimit(<i>k</i> (<i>y<sub>Pum</sub></i> &minus; <i>dp<sub>Rel</sub></i>), 0, 1, <i>dY</i>),
+</p>
+<p>
+with <i>y<sub>Pum</sub></i> = <code>hysPum.y</code>, a
+<a href=\"modelica://FastSmoothBuildings.Controls.Hysteresis\">Hysteresis</a> of <i>y<sub>Max</sub></i> between 0.01
+and 0.5. The set point of the relative head is 1 while the pump is on and 0 while it is off; the on/off decision is
+a bistable state, the limits of the speed smooth, so the control has no event.
+</p>
+<h4>Parameters</h4>
+<p>
+<code>nVal</code> = 1 valves; <code>k</code> = 1; <code>dY</code> = 10<sup>&minus;3</sup>, the half-width of the
+smooth limits of the speed; <code>dMax</code> = 10<sup>&minus;3</sup>, the width of the smooth maximum of the
+openings. The hysteresis keeps its defaults (<code>hysPum.tau</code> = 10 s, <code>hysPum.dU</code> = 0.049).
+</p>
+<h4>Use</h4>
+<p>
+The output <code>yMax</code> is read by
+<a href=\"modelica://FastSmoothBuildings.Controls.BoilerDemand\">BoilerDemand</a>. See
+<a href=\"modelica://FastSmoothBuildings.Examples.BoilerCircuit\">Examples.BoilerCircuit</a> and
+<a href=\"modelica://FastSmoothBuildings.Examples.HeatPumpCircuit\">Examples.HeatPumpCircuit</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Controls</code>.</li>
+</ul>
+</html>"));
 end CollectorControl;

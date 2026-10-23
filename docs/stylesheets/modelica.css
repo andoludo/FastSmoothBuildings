@@ -1,0 +1,10 @@
+/* The HTML of the Documentation annotations of the classes */
+.modelica-documentation table {
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+.modelica-documentation td,
+.modelica-documentation th {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  padding: 0.2em 0.6em;
+}

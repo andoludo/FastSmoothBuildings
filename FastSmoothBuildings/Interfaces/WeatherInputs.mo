@@ -16,5 +16,26 @@ connector WeatherInputs "Weather data: inputs of building_mpc (from a weather fi
       Ellipse(fillPattern=FillPattern.Solid, extent={{-5,15},{5,25}}),
       Ellipse(fillPattern=FillPattern.Solid, extent={{55,15},{65,25}}),
       Ellipse(fillPattern=FillPattern.Solid, extent={{-35,-25},{-25,-15}}),
-      Ellipse(fillPattern=FillPattern.Solid, extent={{25,-25},{35,-15}})}));
+      Ellipse(fillPattern=FillPattern.Solid, extent={{25,-25},{35,-15}})}),
+    Documentation(info="<html>
+<h4>Purpose</h4>
+<p>
+The weather data as inputs of <code>building_mpc</code>, the model for optimal control, from a weather file or a
+forecast: <code>TDryBul</code> and <code>TBlaSky</code> (K), <code>winSpe</code> (m/s), <code>winDir</code> (rad, 0
+for a wind from the north), <code>HDirNor</code>, <code>HDifHor</code> and <code>HGloHor</code>
+(W/m<sup>2</sup>). Signals, not flow variables.
+</p>
+<h4>Use</h4>
+<p>
+Declared at the top level of the model, its variables are inputs of the CasADi function (see
+<a href=\"modelica://FastSmoothBuildings.UsersGuide.Translation\">Translation into CasADi</a>). They are the seven
+inputs of <a href=\"modelica://FastSmoothBuildings.BoundaryConditions.Weather\">BoundaryConditions.Weather</a>, which
+adds the solar position, the Perez coefficients and the atmospheric pressure of the
+<a href=\"modelica://FastSmoothBuildings.Interfaces.WeatherBus\">WeatherBus</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: moved from trano's <code>FastModel.Interfaces</code>.</li>
+</ul>
+</html>"));
 end WeatherInputs;

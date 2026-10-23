@@ -20,4 +20,20 @@ record DoubleClear = FastSmoothBuildings.Data.Glazing (
     0.08216023482, 0.08385431212, 0.08303389368, 0.07585615681, 0.05645076246, 0, 0.08526920479}},
   absIR_a=0.84,
   absIR_b=0.84,
-  UFra=1.4) "Clear double glazing of BESTEST case 600: two 3 mm panes, 12 mm of air";
+  UFra=1.4) "Clear double glazing of BESTEST case 600: two 3 mm panes, 12 mm of air"
+  annotation (Documentation(info="<html>
+<p>
+The clear double glazing of BESTEST case 600 (ASHRAE Standard 140), a
+<a href=\"modelica://FastSmoothBuildings.Data.Glazing\">Data.Glazing</a>: two panes of 3.048 mm
+(<i>k</i> = 1 W/(m K)) around a gap of 12 mm of air, long-wave emissivity 0.84 on every face. Solar
+transmittance 0.699 at normal incidence, 0.578 hemispherical; frame transmittance 1.4 W/(m<sup>2</sup> K).
+</p>
+<p>
+The windows of <a href=\"modelica://FastSmoothBuildings.Examples.FreeFloatingRoom\">FreeFloatingRoom</a> and
+<a href=\"modelica://FastSmoothBuildings.Examples.VentilatedRoom\">VentilatedRoom</a>.
+</p>
+</html>", revisions="<html>
+<ul>
+<li>October 2026: first version.</li>
+</ul>
+</html>"));

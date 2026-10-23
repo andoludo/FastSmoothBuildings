@@ -1,6 +1,8 @@
 [project]
 name = "fastsmoothbuildings"
-dynamic = ["version"]
+# the version of the Modelica library (its version annotation), written here too by scripts/bump_version.py: a
+# static version lets uv resolve trano, which depends on this package, in the study group
+version = "0.2.0"
 description = "Smooth, event-free Modelica models of buildings and their systems, close to Buildings and translated into an explicit CasADi ODE for model predictive control."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -42,6 +44,25 @@ test = ["numpy>=2,<3", "pytest>=9.0.3,<10"]
 rumoca = ["casadi>=3.6,<4", "rumoca>=0.10.3,<0.11"]
 lint = [{ include-group = "test" }, "mypy>=2.1.0,<3", "ruff>=0.15.16,<0.16"]
 dev = [{ include-group = "lint" }, { include-group = "rumoca" }]
+# study: the study against Buildings with the models trano generates (study/), and the documentation site
+study = [
+    { include-group = "rumoca" },
+    "trano>=0.61,<1",
+    "trano-simulate>=0.2.0,<1",
+    "trano-optimization>=0.3.0,<1",
+    "pandas>=2.2,<3",
+    "plotly>=6,<7",
+    "pyyaml>=6,<7",
+    "pandas-stubs>=2.2,<3",
+    "types-pyyaml>=6,<7",
+]
+docs = [
+    "mkdocs>=1.6.1,<2",
+    "mkdocs-material>=9.5.42,<10",
+    "mkdocs-gen-files>=0.5,<0.6",
+    "mkdocs-literate-nav>=0.6,<0.7",
+    "markdown-include>=0.8.1,<0.9",
+]
 
 [tool.uv]
 default-groups = ["dev"]
@@ -54,11 +75,6 @@ rumoca = { git = "https://github.com/CogniPilot/rumoca", rev = "33c21141791cbc34
 [build-system]
 requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
-
-[tool.hatch.version]
-# the version of the Modelica library is the version of the package
-path = "FastSmoothBuildings/package.mo"
-pattern = '(?m)^\s*version\s*=\s*"(?P<version>[^"]+)"'
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/fastsmoothbuildings"]
@@ -86,14 +102,18 @@ select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF", "PL", "PERF", "C4", "PIE"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "PLR2004", "S603"]
+# the study was written in trano, whose rules allow the imports inside functions (optional dependencies, Docker)
+"study/**" = ["PLC0415", "PLR2004"]
+"tests/study/**" = ["S101", "PLR2004", "PLC0415"]
 
 [tool.mypy]
 strict = true
 python_version = "3.11"
-files = ["src", "tests", "scripts"]
+# the study needs trano (the study group): its own job checks it, mypy study tests/study
+files = ["src", "tests/*.py", "scripts"]
 mypy_path = "src"
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]
-module = ["casadi", "casadi.*", "rumoca", "rumoca.*"]
+module = ["casadi", "casadi.*", "rumoca", "rumoca.*", "plotly", "plotly.*", "buildingspy", "buildingspy.*", "mkdocs_gen_files"]
 ignore_missing_imports = true

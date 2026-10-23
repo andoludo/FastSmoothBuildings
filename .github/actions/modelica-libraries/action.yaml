@@ -1,0 +1,44 @@
+name: Modelica libraries
+description: >-
+  Restore the Modelica libraries the study simulates with (Modelica, Buildings, IDEAS) from the cache into
+  .cache/omlibs, or install them there with trano-simulate's own container setup, so that CI installs what the
+  simulations expect. Set TRANO_MODELICA_LIBRARIES to that directory: the simulations then mount the libraries
+  instead of installing them at every container start. Run after `uv sync --group study`.
+
+runs:
+  using: composite
+  steps:
+    - name: Pull the OpenModelica image
+      shell: bash
+      run: docker pull openmodelica/openmodelica:v1.26.9-ompython
+
+    - name: Restore the Modelica libraries
+      id: libraries
+      uses: actions/cache@v4
+      with:
+        path: .cache/omlibs
+        key: omlibs-${{ hashFiles('uv.lock') }}
+        restore-keys: omlibs-
+
+    - name: Install the Modelica libraries
+      if: steps.libraries.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        TRANO_MODELICA_LIBRARIES: ${{ github.workspace }}/.cache/omlibs
+      run: |
+        mkdir -p .cache/omlibs
+        uv run python - <<'PYTHON'
+        import sys
+        import tempfile
+        from pathlib import Path
+
+        import trano_simulate.simulate  # noqa: F401 - the module, which the package hides behind its function
+
+        simulate = sys.modules["trano_simulate.simulate"]
+        # starting a container installs the missing libraries into the mounted directory
+        with tempfile.TemporaryDirectory() as project, simulate.container(
+            simulate.client(), Path(project), container_name="libraries"
+        ):
+            pass
+        PYTHON
+        ls .cache/omlibs
