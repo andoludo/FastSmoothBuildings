@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.0
 
 First release of the library as FastSmoothBuildings, migrated from the `FastModel` package of
 [trano](https://github.com/andoludo/trano) at trano commit c70f8d2 (pull request andoludo/trano#60):

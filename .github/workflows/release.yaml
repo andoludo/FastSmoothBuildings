@@ -1,31 +1,82 @@
 name: Release
 
-# A tag v<version> publishes the Python package on PyPI (trusted publishing, environment "pypi") and a GitHub
-# release with the library as a zip for OpenModelica and Dymola; the tag must match the version annotation of the
-# library.
+# Releases the version of the library (the version annotation of FastSmoothBuildings/package.mo) when CI has
+# passed on main and the tag v<version> does not exist yet: the wheel and the sdist on PyPI, then the tag and a
+# GitHub release with the notes of CHANGELOG.md and the library as a zip for OpenModelica and Dymola. To release,
+# raise the version in package.mo and add its section to CHANGELOG.md in a pull request.
+#
+# PyPI accepts the upload with the secret PYPI_API_TOKEN (a token of the PyPI account) or, without it, by trusted
+# publishing (a publisher for this repository and this workflow, release.yaml, on PyPI).
 on:
-  push:
-    tags: ["v*"]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
-  build:
+  version:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
+      sha: ${{ steps.version.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
-      - name: The tag is the version of the library
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - id: version
+        name: The version of the library, and whether it is released already
         run: |
           version=$(sed -n 's/^\s*version\s*=\s*"\([^"]*\)".*/\1/p' FastSmoothBuildings/package.mo | head -n 1)
-          test "${GITHUB_REF_NAME}" = "v${version}" || { echo "tag ${GITHUB_REF_NAME}, library ${version}"; exit 1; }
-          echo "VERSION=${version}" >> "$GITHUB_ENV"
+          test -n "$version"
+          if git ls-remote --exit-code --tags origin "refs/tags/v${version}" > /dev/null; then
+            echo "v${version} is released already"
+            release=false
+          else
+            echo "v${version} is not released yet"
+            release=true
+          fi
+          {
+            echo "version=${version}"
+            echo "release=${release}"
+            echo "sha=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: version
+    if: needs.version.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.version.outputs.sha }}
+      - uses: astral-sh/setup-uv@v5
       - run: uv build
       - run: uvx twine check --strict dist/*
-      - run: |
+      - name: The packages carry the version of the library
+        run: |
+          test -f "dist/fastsmoothbuildings-${VERSION}-py3-none-any.whl"
+          test -f "dist/fastsmoothbuildings-${VERSION}.tar.gz"
+      - name: The library as a zip, the notes of the release
+        run: |
           mkdir modelica
           zip -qr "modelica/FastSmoothBuildings-${VERSION}.zip" FastSmoothBuildings LICENSE
+          awk -v version="${VERSION}" '/^## / { keep = index($0, "## " version) == 1; next } keep' CHANGELOG.md \
+            > modelica/notes.md
+          test -s modelica/notes.md || { echo "CHANGELOG.md has no section for ${VERSION}"; exit 1; }
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -38,27 +89,41 @@ jobs:
   pypi:
     needs: build
     runs-on: ubuntu-latest
-    environment: pypi
     permissions:
-      id-token: write
+      id-token: write  # trusted publishing
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: astral-sh/setup-uv@v5
+      - name: Publish on PyPI
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          if [ -n "${PYPI_API_TOKEN}" ]; then
+            uv publish --token "${PYPI_API_TOKEN}" dist/*
+          else
+            uv publish --trusted-publishing always dist/*
+          fi
 
   github-release:
-    needs: build
+    needs: [version, pypi]
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts/
-          merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*
-          generate_release_notes: true
+          tag_name: v${{ env.VERSION }}
+          target_commitish: ${{ needs.version.outputs.sha }}
+          name: FastSmoothBuildings ${{ env.VERSION }}
+          body_path: artifacts/modelica/notes.md
+          files: |
+            artifacts/dist/*
+            artifacts/modelica/*.zip

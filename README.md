@@ -100,6 +100,13 @@ compare them with `FastSmoothBuildings/Resources/ReferenceResults/OpenModelica`;
 --update-references` rewrites the references after a deliberate change. The rumoca tests integrate the CasADi models
 and compare them with the same references, without Docker.
 
+### Releasing
+
+Raise the version annotation of `FastSmoothBuildings/package.mo` and add its section to `CHANGELOG.md` in a pull
+request. Once CI passes on `main`, the release workflow publishes the new version on PyPI and creates the tag and the
+GitHub release, with the library as a zip for OpenModelica and Dymola. PyPI accepts the upload with the repository
+secret `PYPI_API_TOKEN` or by trusted publishing.
+
 ## License
 
 BSD 3-Clause; the portions that follow the Modelica Buildings Library carry its license too (see
