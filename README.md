@@ -38,14 +38,15 @@ import rumoca
 
 import fastsmoothbuildings
 
-session = rumoca.Session(roots=[str(fastsmoothbuildings.ROOT)])  # rumoca reads the library from its folder
+session = rumoca.Session(roots=[str(fastsmoothbuildings.LIBRARY)])  # rumoca reads the library from its folder
 model = session.loads(source, model="MyBuilding.building").to_casadi()
 
 text = fastsmoothbuildings.bundle()  # or the whole library as one file, to embed it in a generated model
 ```
 
-`fastsmoothbuildings.ROOT` is the folder to put on `MODELICAPATH`, `fastsmoothbuildings.LIBRARY` the library
-itself, `fastsmoothbuildings.__version__` the version of the library (its `version` annotation).
+`fastsmoothbuildings.LIBRARY` is the folder of the library (rumoca reads every Modelica file below a root, so give it
+the library itself), `fastsmoothbuildings.ROOT` the folder that holds it, to put on `MODELICAPATH`, and
+`fastsmoothbuildings.__version__` the version of the library (its `version` annotation).
 
 ## The library
 

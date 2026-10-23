@@ -1,8 +1,8 @@
 """FastSmoothBuildings: the Modelica library, and where tools find it.
 
-``ROOT`` is the folder to put on ``MODELICAPATH`` or to pass to rumoca (``rumoca.Session(roots=[str(ROOT)])``),
-``LIBRARY`` the folder of the library itself, ``bundle()`` the library as the text of one file, to embed it in a
-generated model.
+``LIBRARY`` is the folder of the library, to pass to rumoca (``rumoca.Session(roots=[str(LIBRARY)])``: rumoca reads
+every Modelica file below a root); ``ROOT`` the folder that holds it, to put on ``MODELICAPATH``; ``bundle()`` the
+library as the text of one file, to embed it in a generated model.
 """
 
 from __future__ import annotations

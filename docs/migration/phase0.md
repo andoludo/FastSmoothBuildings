@@ -77,9 +77,9 @@ these templates.
 
 `Utilities.regStep` and `Envelope.Functions.gapConductance` carry a sample of the documentation of phase 4
 (purpose, equations as implemented, smoothing, relation to Buildings, validation, references, revisions) in HTML
-with tables, sub- and superscripts, entities, escaped quotes and `modelica://` links. The two documented classes
-are in [`phase0/`](phase0/), with the documentation of `gapConductance` as a browser shows it
-([`phase0/gap_conductance_documentation.png`](phase0/gap_conductance_documentation.png)).
+with tables, sub- and superscripts, entities, escaped quotes and `modelica://` links; phase 1 kept it in both
+classes. The documentation of `gapConductance` as a browser shows it:
+[`phase0/gap_conductance_documentation.png`](phase0/gap_conductance_documentation.png).
 
 * OpenModelica loads it without a message and `getDocumentationAnnotation` returns it whole (3687 characters for
   `gapConductance`, the quotes unescaped, the links kept);

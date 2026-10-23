@@ -12,4 +12,9 @@ package Vitocal251A08 "Viessmann Vitocal 251-A08, EN 14511"
     {0, 2032, 2478, 2760, 3095, 3375, 3085, 2521, 2511}, {0, 0, 2201, 2699, 3193, 3398, 3330, 2822, 2817}}
     "Electrical power";
   constant Real mCon_flow_nominal(unit="kg/s") = 5600/5/4184 "Nominal condenser flow of the record";
+  annotation (Documentation(info="<html>
+<p>
+Viessmann Vitocal 251-A08 after EN 14511: heating capacity and electrical power against the source temperature and the condenser outlet temperature.
+</p>
+</html>"));
 end Vitocal251A08;

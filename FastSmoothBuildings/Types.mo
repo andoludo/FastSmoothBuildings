@@ -11,4 +11,10 @@ package Types "Types and constants"
     constant Integer Polynomial = 2 "eta = a[1] + a[2]*y + a[3]*y^2 + ...";
     constant Integer QuadraticLinear = 3 "eta = a[1] + a[2]*y + a[3]*y^2 + (a[4] + a[5]*y + a[6]*y^2)*T";
   end EfficiencyCurves;
+  annotation (Documentation(info="<html>
+<p>
+Constants of the tilts of surfaces and of the efficiency curves of boilers, as Buildings.Types.Tilt and
+Buildings.Fluid.Types.EfficiencyCurves.
+</p>
+</html>"));
 end Types;
