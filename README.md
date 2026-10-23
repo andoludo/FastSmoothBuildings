@@ -69,6 +69,23 @@ switches are `regStep` transitions whose width is a parameter. rumoca sizes arra
 literal parameters only, so the records of the constructions carry their layer and node counts written out (see
 the User's Guide).
 
+## Examples
+
+| Example | What it shows |
+|---|---|
+| `Examples.FreeFloatingRoom` | The room of BESTEST case 600FF under clear winter days |
+| `Examples.IdealHeatingRoom` | The same room heated to 20 °C and cooled to 27 °C by an ideal system |
+| `Examples.TwoZones` | Two rooms with an internal wall, a slab on the ground, an on/off and a proportional room controller |
+| `Examples.VentilatedRoom` | Balanced ventilation with heat recovery |
+| `Examples.BoilerCircuit` | Gas boiler, pump, three-way valve, radiator and thermostatic valve, pressure-driven flows (closed loop) |
+| `Examples.BoilerCircuitSetFlows` | The same circuit with set flows, as the model of optimal control has them |
+| `Examples.HeatPumpCircuit` | Air-to-water heat pump with its buffer and two radiators |
+| `Examples.Photovoltaics` | Arrays facing south and west |
+
+The `Validation` packages of `Utilities`, `Envelope` and `Controls` exercise the smooth functions, the schedules, the
+gas gaps, the overhangs and side fins, the hysteresis and the PI controller. Every example translates with rumoca,
+and its CasADi model integrated by CVODES follows the OpenModelica results within 0.01 K on the rooms.
+
 ## Development
 
 ```bash
@@ -79,8 +96,9 @@ uv run ruff check . && uv run ruff format --check . && uv run mypy
 ```
 
 The OpenModelica tests run the examples in the official image `openmodelica/openmodelica:v1.26.9-ompython` and
-compare them with `FastSmoothBuildings/Resources/ReferenceResults`; `uv run pytest -m openmodelica
---update-references` rewrites the references after a deliberate change.
+compare them with `FastSmoothBuildings/Resources/ReferenceResults/OpenModelica`; `uv run pytest -m openmodelica
+--update-references` rewrites the references after a deliberate change. The rumoca tests integrate the CasADi models
+and compare them with the same references, without Docker.
 
 ## License
 

@@ -60,7 +60,7 @@ def simulate(cases: Sequence[Case], work: Path) -> tuple[str, dict[str, Path]]:
         lines += [
             f'simulate({case.qualified}, outputFormat="csv", fileNamePrefix="{case.qualified}",'
             f' variableFilter="{variable_filter(case.variables)}");',
-            f'writeFile("{case.qualified}.log", getErrorString());',
+            f'writeFile("{case.qualified}.messages", getErrorString());',
         ]
     omc("\n".join(lines) + "\n", work)
     return (work / "load.txt").read_text(encoding="utf-8"), {

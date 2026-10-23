@@ -31,7 +31,7 @@ def test_the_model_matches_its_reference_results(
     case: Case, simulations: tuple[str, dict[str, Path]], request: pytest.FixtureRequest
 ) -> None:
     _, results = simulations
-    assert results[case.name].is_file(), (results[case.name].parent / f"{case.qualified}.log").read_text()
+    assert results[case.name].is_file(), (results[case.name].parent / f"{case.qualified}.messages").read_text()
     values = read(results[case.name], case.variables)
     if request.config.getoption("--update-references"):
         write(case.reference, values)
