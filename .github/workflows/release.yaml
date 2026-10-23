@@ -1,129 +1,104 @@
 name: Release
 
-# Releases the version of the library (the version annotation of FastSmoothBuildings/package.mo) when CI has
-# passed on main and the tag v<version> does not exist yet: the wheel and the sdist on PyPI, then the tag and a
-# GitHub release with the notes of CHANGELOG.md and the library as a zip for OpenModelica and Dymola. To release,
-# raise the version in package.mo and add its section to CHANGELOG.md in a pull request.
+# As trano's pipeline: every change merged into main is released once CI passes on it.
 #
-# PyPI accepts the upload with the secret PYPI_API_TOKEN (a token of the PyPI account) or, without it, by trusted
-# publishing (a publisher for this repository and this workflow, release.yaml, on PyPI).
+# tag      after CI succeeds on a push to main: the version of the library (the version annotation of
+#          FastSmoothBuildings/package.mo) is released as it is when it has no tag yet (the first release, or a
+#          version raised by hand); otherwise its minor version is raised and committed to main ("Auto-increment
+#          release version"). The tag v<version> is pushed with ACCESS_TOKEN: a tag pushed with GITHUB_TOKEN would
+#          start no workflow.
+# publish  on the tag: the wheel and the sdist on PyPI, then the GitHub release with the notes of CHANGELOG.md (or
+#          the commits since the previous tag) and the library as a zip for OpenModelica and Dymola.
+#
+# Secrets: ACCESS_TOKEN, a personal access token allowed to push to this repository (as trano's); PYPI_API_TOKEN, a
+# PyPI API token of the account (as trano's; scoped to the whole account for the first upload, which creates the
+# project on PyPI).
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
+  push:
+    tags: ["v*"]
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: release
-  cancel-in-progress: false
-
 jobs:
-  version:
+  tag:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       !contains(github.event.workflow_run.head_commit.message, 'Auto-increment'))
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      release: ${{ steps.version.outputs.release }}
-      sha: ${{ steps.version.outputs.sha }}
+    concurrency:
+      group: release-tag
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-      - id: version
-        name: The version of the library, and whether it is released already
+          token: ${{ secrets.ACCESS_TOKEN }}
+          ref: main
+          fetch-depth: 0
+      - name: Tag the version to release
+        env:
+          TESTED: ${{ github.event.workflow_run.head_sha }}
         run: |
-          version=$(sed -n 's/^\s*version\s*=\s*"\([^"]*\)".*/\1/p' FastSmoothBuildings/package.mo | head -n 1)
-          test -n "$version"
-          if git ls-remote --exit-code --tags origin "refs/tags/v${version}" > /dev/null; then
-            echo "v${version} is released already"
-            release=false
-          else
-            echo "v${version} is not released yet"
-            release=true
+          if [ -n "${TESTED}" ] && [ "$(git rev-parse HEAD)" != "${TESTED}" ]; then
+            echo "main has moved on since ${TESTED}: the CI run of its new head releases it"
+            exit 0
           fi
-          {
-            echo "version=${version}"
-            echo "release=${release}"
-            echo "sha=$(git rev-parse HEAD)"
-          } >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          version=$(python3 scripts/bump_version.py)
+          if git rev-parse -q --verify "refs/tags/v${version}" > /dev/null; then
+            version=$(python3 scripts/bump_version.py minor)
+            git commit -am "Auto-increment release version to ${version}"
+            git push origin HEAD:main
+          fi
+          git tag -a "v${version}" -m "FastSmoothBuildings ${version}"
+          git push origin "v${version}"
+          echo "Tagged v${version}" >> "$GITHUB_STEP_SUMMARY"
 
-  build:
-    needs: version
-    if: needs.version.outputs.release == 'true'
+  publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ needs.version.outputs.version }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.version.outputs.sha }}
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
+      - name: The tag is the version of the library
+        run: |
+          version=$(python3 scripts/bump_version.py)
+          test "${GITHUB_REF_NAME}" = "v${version}" || { echo "tag ${GITHUB_REF_NAME}, library ${version}"; exit 1; }
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
       - run: uv build
       - run: uvx twine check --strict dist/*
-      - name: The packages carry the version of the library
-        run: |
-          test -f "dist/fastsmoothbuildings-${VERSION}-py3-none-any.whl"
-          test -f "dist/fastsmoothbuildings-${VERSION}.tar.gz"
       - name: The library as a zip, the notes of the release
         run: |
           mkdir modelica
           zip -qr "modelica/FastSmoothBuildings-${VERSION}.zip" FastSmoothBuildings LICENSE
           awk -v version="${VERSION}" '/^## / { keep = index($0, "## " version) == 1; next } keep' CHANGELOG.md \
-            > modelica/notes.md
-          test -s modelica/notes.md || { echo "CHANGELOG.md has no section for ${VERSION}"; exit 1; }
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-      - uses: actions/upload-artifact@v4
-        with:
-          name: modelica
-          path: modelica/
-
-  pypi:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write  # trusted publishing
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-      - uses: astral-sh/setup-uv@v5
-      - name: Publish on PyPI
-        env:
-          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          if [ -n "${PYPI_API_TOKEN}" ]; then
-            uv publish --token "${PYPI_API_TOKEN}" dist/*
-          else
-            uv publish --trusted-publishing always dist/*
+            > notes.md
+          if [ ! -s notes.md ]; then
+            previous=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2> /dev/null || true)
+            git log --no-merges --pretty=format:"- %s" "${previous:+${previous}..}${GITHUB_REF_NAME}" > notes.md
           fi
-
-  github-release:
-    needs: [version, pypi]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      VERSION: ${{ needs.version.outputs.version }}
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: artifacts/
+      - name: Publish on PyPI
+        run: uv publish dist/*
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ env.VERSION }}
-          target_commitish: ${{ needs.version.outputs.sha }}
+          tag_name: ${{ github.ref_name }}
           name: FastSmoothBuildings ${{ env.VERSION }}
-          body_path: artifacts/modelica/notes.md
+          body_path: notes.md
           files: |
-            artifacts/dist/*
-            artifacts/modelica/*.zip
+            dist/*
+            modelica/*.zip

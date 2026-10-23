@@ -102,10 +102,13 @@ and compare them with the same references, without Docker.
 
 ### Releasing
 
-Raise the version annotation of `FastSmoothBuildings/package.mo` and add its section to `CHANGELOG.md` in a pull
-request. Once CI passes on `main`, the release workflow publishes the new version on PyPI and creates the tag and the
-GitHub release, with the library as a zip for OpenModelica and Dymola. PyPI accepts the upload with the repository
-secret `PYPI_API_TOKEN` or by trusted publishing.
+As in trano, every change merged into `main` is released once CI passes on it: the release workflow tags the version
+of `FastSmoothBuildings/package.mo` when it has no tag yet (the first release, or a version raised by hand in a pull
+request), and otherwise raises the minor version and commits it (`python scripts/bump_version.py minor`). The tag
+publishes the wheel and the sdist on PyPI and creates the GitHub release with the library as a zip for OpenModelica
+and Dymola; its notes are the section of the version in `CHANGELOG.md`, or the commits since the previous release.
+The workflow uses the repository secrets `ACCESS_TOKEN` (a personal access token that may push to the repository) and
+`PYPI_API_TOKEN` (a PyPI API token), as trano does.
 
 ## License
 
