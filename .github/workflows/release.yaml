@@ -4,9 +4,9 @@ name: Release
 #
 # tag      after CI succeeds on a push to main: the version of the library (the version annotation of
 #          FastSmoothBuildings/package.mo) is released as it is when it has no tag yet (the first release, or a
-#          version raised by hand); otherwise its minor version is raised and committed to main ("Auto-increment
-#          release version"). The tag v<version> is pushed with ACCESS_TOKEN: a tag pushed with GITHUB_TOKEN would
-#          start no workflow.
+#          version raised by hand); otherwise its minor version is raised (package.mo, pyproject.toml, uv.lock) and
+#          committed to main ("Auto-increment release version"). The tag v<version> is pushed with ACCESS_TOKEN: a
+#          tag pushed with GITHUB_TOKEN would start no workflow.
 # publish  on the tag: the wheel and the sdist on PyPI, then the GitHub release with the notes of CHANGELOG.md (or
 #          the commits since the previous tag) and the library as a zip for OpenModelica and Dymola.
 #
@@ -43,6 +43,7 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
           ref: main
           fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
       - name: Tag the version to release
         env:
           TESTED: ${{ github.event.workflow_run.head_sha }}
@@ -56,6 +57,7 @@ jobs:
           version=$(python3 scripts/bump_version.py)
           if git rev-parse -q --verify "refs/tags/v${version}" > /dev/null; then
             version=$(python3 scripts/bump_version.py minor)
+            uv lock  # the lock file carries the version of the project
             git commit -am "Auto-increment release version to ${version}"
             git push origin HEAD:main
           fi

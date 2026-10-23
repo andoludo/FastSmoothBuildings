@@ -27,9 +27,12 @@ def test_the_script_shows_the_version_of_the_library() -> None:
     assert run() == fastsmoothbuildings.__version__
 
 
-def test_the_package_has_the_version_of_the_library() -> None:
-    pyproject = tomllib.loads((SCRIPT.parents[1] / "pyproject.toml").read_text(encoding="utf-8"))
-    assert pyproject["project"]["version"] == fastsmoothbuildings.__version__
+def test_the_package_and_its_lock_file_have_the_version_of_the_library() -> None:
+    root = SCRIPT.parents[1]
+    pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+    lock = tomllib.loads((root / "uv.lock").read_text(encoding="utf-8"))
+    [locked] = [package["version"] for package in lock["package"] if package["name"] == pyproject["project"]["name"]]
+    assert pyproject["project"]["version"] == locked == fastsmoothbuildings.__version__
 
 
 @pytest.mark.parametrize(("part", "expected"), [("major", "1.0.0"), ("minor", "0.3.0"), ("patch", "0.2.4")])
