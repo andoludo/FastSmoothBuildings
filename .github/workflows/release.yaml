@@ -32,7 +32,7 @@ jobs:
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.event == 'push' &&
-       !contains(github.event.workflow_run.head_commit.message, 'Auto-increment'))
+       !startsWith(github.event.workflow_run.head_commit.message, 'Auto-increment release version'))
     runs-on: ubuntu-latest
     concurrency:
       group: release-tag
