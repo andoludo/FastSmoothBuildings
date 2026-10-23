@@ -1,0 +1,101 @@
+[project]
+name = "fastsmoothbuildings"
+dynamic = ["version"]
+description = "Smooth, event-free Modelica models of buildings and their systems, close to Buildings and translated into an explicit CasADi ODE for model predictive control."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [{ name = "Ando Andriamamonjy", email = "andoludovic.andriamamonjy@gmail.com" }]
+keywords = [
+    "modelica",
+    "building energy simulation",
+    "model predictive control",
+    "casadi",
+    "rumoca",
+    "optimal control",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/andoludo/FastSmoothBuildings"
+Repository = "https://github.com/andoludo/FastSmoothBuildings"
+Issues = "https://github.com/andoludo/FastSmoothBuildings/issues"
+Changelog = "https://github.com/andoludo/FastSmoothBuildings/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "casadi>=3.6,<4",
+    "mypy>=2.1.0,<3",
+    "numpy>=2,<3",
+    "pytest>=9.0.3,<10",
+    "rumoca>=0.10.3,<0.11",
+    "ruff>=0.15.16,<0.16",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.sources]
+# rumoca 0.10.3 from its main branch, as trano-optimization: the release on PyPI (0.10.2) does not export connected
+# models to CasADi, and the later commits of main refuse the pressure-driven valves and the heat pump
+rumoca = { git = "https://github.com/CogniPilot/rumoca", rev = "33c21141791cbc341f4788ff6353d2f49d1c740a", subdirectory = "crates/rumoca-bind-python" }
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+# the version of the Modelica library is the version of the package
+path = "FastSmoothBuildings/package.mo"
+pattern = '(?m)^\s*version\s*=\s*"(?P<version>[^"]+)"'
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fastsmoothbuildings"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"FastSmoothBuildings" = "fastsmoothbuildings/modelica/FastSmoothBuildings"
+
+[tool.hatch.build.targets.sdist]
+include = ["/FastSmoothBuildings", "/src", "/tests", "/README.md", "/LICENSE", "/CHANGELOG.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "openmodelica: simulations in OpenModelica (Docker and the official OpenModelica image)",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["docs/migration/phase0"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF", "PL", "PERF", "C4", "PIE", "FURB", "N", "ANN", "S", "PT", "C901"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "S603"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+files = ["src", "tests", "scripts"]
+mypy_path = "src"
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["casadi", "casadi.*", "rumoca", "rumoca.*"]
+ignore_missing_imports = true

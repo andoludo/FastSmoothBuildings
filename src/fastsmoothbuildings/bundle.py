@@ -6,9 +6,11 @@ import re
 from collections.abc import Sequence
 from pathlib import Path
 
+from fastsmoothbuildings._paths import LIBRARY
+
 INDENT = "  "
 WITHIN = re.compile(r"\A\s*within\b[^;]*;[ \t]*\n")
-DOCUMENTATION = re.compile(r"Documentation\s*\(")
+DOCUMENTATION = re.compile(r"\bDocumentation\s*\(")
 CLASS_ANNOTATION = re.compile(rf"^{INDENT}annotation\b")
 
 
@@ -55,6 +57,30 @@ def code_starts(lines: Sequence[str]) -> list[bool]:
     return starts
 
 
+def code_mask(text: str) -> list[bool]:
+    """Whether each character of ``text`` is code: outside strings and comments."""
+    mask = [True] * len(text)
+    index, in_string = 0, False
+    while index < len(text):
+        if in_string:
+            mask[index] = False
+            if text[index] == "\\":
+                mask[index + 1 : index + 2] = [False] * len(mask[index + 1 : index + 2])
+                index += 2
+                continue
+            in_string = text[index] != '"'
+        elif text[index] == '"':
+            mask[index], in_string = False, True
+        elif text.startswith("//", index) or text.startswith("/*", index):
+            end = text.find("\n" if text[index + 1] == "/" else "*/", index + 2)
+            end = len(text) if end < 0 else end + (0 if text[index + 1] == "/" else 2)
+            mask[index:end] = [False] * (end - index)
+            index = end
+            continue
+        index += 1
+    return mask
+
+
 def _class_annotation(body: Sequence[str]) -> int:
     """Index of the line that opens the annotation of the class in ``body`` (its declaration and elements),
     ``len(body)`` without one: the classes stored in files go before it, an annotation ends a class."""
@@ -63,7 +89,7 @@ def _class_annotation(body: Sequence[str]) -> int:
     return found[-1] if found else len(body)
 
 
-def _indented(lines: list[str], depth: int) -> list[str]:
+def _indented(lines: Sequence[str], depth: int) -> list[str]:
     return [INDENT * depth + line if line else line for line in lines]
 
 
@@ -85,47 +111,40 @@ def _package_lines(package: Path, depth: int) -> list[str]:
     return [*lines, *_indented([*body[annotation:], end], depth)]
 
 
-def bundle(library: Path) -> str:
-    """The library at ``library`` (the folder holding its ``package.mo``) as the text of one file."""
-    return "\n".join(_package_lines(library, 0)) + "\n"
+def bundle(library: Path | None = None, *, documentation: bool = True) -> str:
+    """The library at ``library`` (the folder holding its ``package.mo``, FastSmoothBuildings by default) as the
+    text of one file; ``documentation=False`` leaves out the ``Documentation`` annotations."""
+    text = "\n".join(_package_lines(library or LIBRARY, 0)) + "\n"
+    return text if documentation else strip_documentation(text)
 
 
 def strip_documentation(text: str) -> str:
-    """``text`` without its ``Documentation(...)`` annotations, which tools that only translate the model skip."""
+    """``text`` without its ``Documentation(...)`` annotations (with the comma that joins one to the other
+    elements of its ``annotation``)."""
+    mask = code_mask(text)
     pieces: list[str] = []
     position = 0
     for match in DOCUMENTATION.finditer(text):
-        if match.start() < position:
+        if match.start() < position or not mask[match.start()]:
             continue
-        end = _closing_parenthesis(text, match.end())
-        start = match.start()
-        # drop the comma that separates the annotation from the previous element of ``annotation(...)``
+        start, end = match.start(), _closing_parenthesis(text, match.end(), mask)
         before = text[position:start].rstrip()
+        after = text[end:].lstrip()
         if before.endswith(","):
             before = before[:-1]
-        elif text[end:].lstrip().startswith(","):
-            end = end + len(text[end:]) - len(text[end:].lstrip()) + 1
+        elif after.startswith(","):
+            end = len(text) - len(after) + 1
         pieces.append(before)
         position = end
     pieces.append(text[position:])
     return "".join(pieces)
 
 
-def _closing_parenthesis(text: str, start: int) -> int:
-    """Index just after the parenthesis that closes the one opened before ``start``, skipping strings."""
-    depth, index, in_string = 1, start, False
+def _closing_parenthesis(text: str, start: int, mask: Sequence[bool]) -> int:
+    """Index just after the parenthesis that closes the one opened before ``start``, strings skipped."""
+    depth, index = 1, start
     while depth:
-        character = text[index]
-        if in_string:
-            if character == "\\":
-                index += 1
-            elif character == '"':
-                in_string = False
-        elif character == '"':
-            in_string = True
-        elif character == "(":
-            depth += 1
-        elif character == ")":
-            depth -= 1
+        if mask[index]:
+            depth += {"(": 1, ")": -1}.get(text[index], 0)
         index += 1
     return index
