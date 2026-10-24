@@ -15,8 +15,10 @@ and compare them with the same references, without Docker.
 
 ## Releasing
 
-As in trano, every change merged into `main` is released once CI passes on it: the release workflow tags the version
-of `FastSmoothBuildings/package.mo` when it has no tag yet (the first release, or a version raised by hand in a pull
+A change merged into `main` is released once CI passes on it when it changes what users install: the library, the
+Python package, `pyproject.toml`, `README.md` or `LICENSE` (changes to the tests, the study, the documentation site or
+CI wait for the next such change, as semantic versioning has it). The release workflow tags the version of
+`FastSmoothBuildings/package.mo` when it has no tag yet (the first release, or a version raised by hand in a pull
 request), and otherwise raises the minor version and commits it (`python scripts/bump_version.py minor`). The tag
 publishes the wheel and the sdist on PyPI and creates the GitHub release with the library as a zip for OpenModelica
 and Dymola; its notes are the section of the version in `CHANGELOG.md`, or the commits since the previous release.

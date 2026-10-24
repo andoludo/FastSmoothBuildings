@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+* Releases follow changes of what users install (the library, the Python package, `pyproject.toml`, `README.md`,
+  `LICENSE`); changes to the tests, the study, the documentation site or CI no longer publish a version.
+* Tests: every component has an icon and every port is placed on it (from trano).
+
 ## 0.3.0
 
 * Every class of the library has its documentation (`Documentation(info, revisions)`): purpose, equations,
