@@ -27,8 +27,8 @@ from typing import Any
 import numpy as np
 from trano.data_models.conversion import convert_network
 from trano.elements.jinja import modelica_library
-from trano.elements.library.library import Library
 
+from study._trano import study_library
 from study.analysis.scripts._common import BESTEST_CASES, KELVIN, configure_logging, write_json
 
 HEIGHT, WIDTH, DEPTH = 2.0, 3.0, 1.0
@@ -110,9 +110,7 @@ def shaded_case() -> dict[str, Any]:
     for library in ("FastSmoothBuildingsMPC", "FastSmoothBuildings"):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            text = convert_network(path.stem, path, library=Library.from_configuration(library)).model(
-                include_container=True
-            )
+            text = convert_network(path.stem, path, library=study_library(library)).model(include_container=True)
         model = CasadiModel.from_modelica(text, f"{path.stem}.building_mpc")
         description = model.description
         inputs = np.array([SUNNY.get(name.rsplit(".", 1)[-1], 0.0) for name in description.input_names])

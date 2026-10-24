@@ -8,6 +8,7 @@ import re
 from typing import TYPE_CHECKING
 
 from trano.elements.base import BaseElement
+from trano.elements.library.library import Library
 
 if TYPE_CHECKING:
     from buildingspy.io.outputfile import Reader
@@ -24,6 +25,12 @@ def normalized_model(model: str) -> str:
     pieces = re.split(r";|\b(?=(?:record|package|model|end|equation)\b)", without_annotations)
     statements = {re.sub(r"\s+", "", piece) for piece in pieces} - {""}
     return ";".join(sorted(statements))
+
+
+def study_library(name: str) -> Library:
+    """The trano library ``name``, FastSmoothBuildings embedded in the generated package: the cache of a run is keyed
+    by the model text, which then follows the library, and rumoca translates the text without roots."""
+    return Library.from_configuration(name).model_copy(update={"embed_libraries": True})
 
 
 def model_hash(model: str, library: str, options: SimulationOptions) -> str:

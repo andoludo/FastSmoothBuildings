@@ -20,12 +20,11 @@ import pandas as pd
 import yaml
 from pydantic import BaseModel, Field
 from trano.data_models.conversion import convert_network
-from trano.elements.library.library import Library
 from trano.elements.space import Space
 from trano.utils.utils import is_success
 from trano_simulate.simulate import CONTAINER_MODEL_DIR, SimulationOptions, simulate
 
-from study._trano import find_variable, model_hash, reset_element_names
+from study._trano import find_variable, model_hash, reset_element_names, study_library
 from study.buildings.cases import BASE, CASES, ROOT, StudyCase
 from study.replay.harness import _interval_mean, _of_type, _on_grid, _reader
 
@@ -145,7 +144,7 @@ def variant_yaml(case: StudyCase, variant: str, directory: Path) -> Path:
 
 def network_for(path: Path, library: str, directory: Path) -> Network:
     reset_element_names()
-    network = convert_network(path.stem, path, library=Library.from_configuration(library))
+    network = convert_network(path.stem, path, library=study_library(library))
     network.set_weather_path(directory, CONTAINER_MODEL_DIR)
     return network
 
