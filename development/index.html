@@ -6714,8 +6714,10 @@ compare them with <code>FastSmoothBuildings/Resources/ReferenceResults/OpenModel
 --update-references</code> rewrites the references after a deliberate change. The rumoca tests integrate the CasADi models
 and compare them with the same references, without Docker.</p>
 <h2 id="releasing">Releasing<a class="headerlink" href="#releasing" title="Permanent link">&para;</a></h2>
-<p>As in trano, every change merged into <code>main</code> is released once CI passes on it: the release workflow tags the version
-of <code>FastSmoothBuildings/package.mo</code> when it has no tag yet (the first release, or a version raised by hand in a pull
+<p>A change merged into <code>main</code> is released once CI passes on it when it changes what users install: the library, the
+Python package, <code>pyproject.toml</code>, <code>README.md</code> or <code>LICENSE</code> (changes to the tests, the study, the documentation site or
+CI wait for the next such change, as semantic versioning has it). The release workflow tags the version of
+<code>FastSmoothBuildings/package.mo</code> when it has no tag yet (the first release, or a version raised by hand in a pull
 request), and otherwise raises the minor version and commits it (<code>python scripts/bump_version.py minor</code>). The tag
 publishes the wheel and the sdist on PyPI and creates the GitHub release with the library as a zip for OpenModelica
 and Dymola; its notes are the section of the version in <code>CHANGELOG.md</code>, or the commits since the previous release.
