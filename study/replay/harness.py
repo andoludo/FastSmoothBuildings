@@ -21,16 +21,16 @@ import pandas as pd
 from pydantic import BaseModel, Field
 from trano.data_models.conversion import convert_network
 from trano.elements.bus import DataBus
-from trano.elements.library.library import Library
 from trano.elements.space import Space
 from trano.utils.utils import is_success
 from trano_simulate.simulate import CONTAINER_MODEL_DIR, SimulationOptions, simulate
 
-from study._trano import find_variable, model_hash, reset_element_names
+from study._trano import find_variable, model_hash, reset_element_names, study_library
 from study.replay.cases import CASES, ROOT, MPCCase
 
 if TYPE_CHECKING:
     from buildingspy.io.outputfile import Reader
+    from trano.elements.library.library import Library
     from trano.topology import Network
 
 logger = logging.getLogger(__name__)
@@ -228,7 +228,7 @@ def reference(case: MPCCase, library: str = REFERENCE) -> tuple[Network, Path]:
     if library not in REFERENCES:
         raise ValueError(f"FastSmoothBuildings replays {', '.join(REFERENCES)} simulations, not {library}")
     directory = case_directory(case, library)
-    network = _network(case, Library.from_configuration(library), directory)
+    network = _network(case, study_library(library), directory)
     return network, _simulate(
         network, directory, _options(case, reference=True, library=library), f"{case.id}-{library}"
     )
@@ -268,7 +268,7 @@ def _fast_model_replay(reader: Reader, network: Network, grid: np.ndarray) -> di
         if not _is_hydronic_radiator(emitter):
             columns[f"{emitter.name}_Q"] = _element_heat(reader, emitter, grid)
     for valve in _of_type(network, Valve):
-        nominal = float(valve.processed_parameters(Library.from_configuration(FAST_MODEL_MPC))["m_flow_nominal"])
+        nominal = float(valve.processed_parameters(study_library(FAST_MODEL_MPC))["m_flow_nominal"])
         columns[f"{valve.name}_y"] = (
             _interval_mean(reader, find_variable(reader, f"{valve.name}.m_flow"), grid) / nominal
         )
@@ -280,7 +280,7 @@ def _fast_model_replay(reader: Reader, network: Network, grid: np.ndarray) -> di
         )
     for unit in _of_type(network, AirHandlingUnit):
         ducts = [duct for duct in network.graph.succ[unit] if isinstance(duct, Duct)]
-        library = Library.from_configuration(FAST_MODEL_MPC)
+        library = study_library(FAST_MODEL_MPC)
         nominal = sum(float(duct.processed_parameters(library)["m_flow_nominal"]) for duct in ducts)
         flow = sum(
             (_interval_mean(reader, find_variable(reader, f"{duct.name}.m_flow"), grid) for duct in ducts),
@@ -461,7 +461,7 @@ def compare(case_id: str, model: str = FAST_MODEL, reference_library: str = REFE
         raise ValueError(f"Model {model!r}: expected {FAST_MODEL} or {CLOSED_LOOP}")
     closed_loop = model == CLOSED_LOOP
     directory = case_directory(case, model if reference_library == REFERENCE else f"{model}-{reference_library}")
-    library = Library.from_configuration(FAST_MODEL if closed_loop else FAST_MODEL_MPC)
+    library = study_library(FAST_MODEL if closed_loop else FAST_MODEL_MPC)
     network = _network(case, library, directory)
     replay = np.arange(case.start_time, case.end_time + 1, FINE_REPLAY_INTERVAL if case.fine_replay else INTERVAL)
     columns = {} if closed_loop else _fast_model_replay(reader, buildings_network, replay.astype(float))

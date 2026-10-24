@@ -24,8 +24,8 @@ from typing import Any
 
 import numpy as np
 from trano.data_models.conversion import convert_network
-from trano.elements.library.library import Library
 
+from study._trano import study_library
 from study.analysis.scripts._common import EXAMPLES, KELVIN, configure_logging, logger, write_json
 
 HOUSES = ("residential_after_renovation", "residential_before_renovation")
@@ -46,9 +46,7 @@ PRICE = 0.25
 def model_text(path: Path, library: str) -> str:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        return convert_network(path.stem, path, library=Library.from_configuration(library)).model(
-            include_container=True
-        )
+        return convert_network(path.stem, path, library=study_library(library)).model(include_container=True)
 
 
 def export(path: Path, library: str) -> tuple[Any, float]:

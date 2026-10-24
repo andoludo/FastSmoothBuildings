@@ -28,10 +28,10 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from pydantic import BaseModel, Field
 from trano.data_models.conversion import convert_network
-from trano.elements.library.library import Library
 from trano_optimization import KELVIN, CasadiModel, OptimalControl, OptimalControlSettings
 from trano_optimization.collocation import Collocated, CollocationSettings
 
+from study._trano import study_library
 from study.replay.cases import CASES, ROOT, MPCCase
 from study.replay.harness import (
     CACHE_ROOT,
@@ -120,7 +120,7 @@ def _casadi(case: MPCCase, ocp_hours: int) -> tuple[CasadiBenchmark, dict[str, n
     """Translate building_mpc, replay the OpenModelica run of the runnable model through CVODES and solve an OCP."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        network = convert_network(case.path.stem, case.path, library=Library.from_configuration(FAST_MODEL_MPC))
+        network = convert_network(case.path.stem, case.path, library=study_library(FAST_MODEL_MPC))
         source = network.model(include_container=False)  # flat, as the replayed run of the harness
     started = time.perf_counter()
     model = CasadiModel.from_modelica(source, f"{case.path.stem}.building_mpc")

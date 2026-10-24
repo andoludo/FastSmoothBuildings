@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -790,7 +790,7 @@ study = [
     { name = "plotly", specifier = ">=6,<7" },
     { name = "pyyaml", specifier = ">=6,<7" },
     { name = "rumoca", git = "https://github.com/CogniPilot/rumoca?subdirectory=crates%2Frumoca-bind-python&rev=33c21141791cbc341f4788ff6353d2f49d1c740a" },
-    { name = "trano", specifier = ">=0.61,<1" },
+    { name = "trano", specifier = ">=0.64,<1" },
     { name = "trano-optimization", specifier = ">=0.3.0,<1" },
     { name = "trano-simulate", specifier = ">=0.2.0,<1" },
     { name = "types-pyyaml", specifier = ">=6,<7" },
@@ -3779,7 +3779,7 @@ wheels = [
 
 [[package]]
 name = "trano"
-version = "0.61.0"
+version = "0.64.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "buildingspy" },
@@ -3799,9 +3799,9 @@ dependencies = [
     { name = "typer" },
     { name = "yattag" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d8/71/6079b61eafc70db1e1eeba738d01c46696abe89ca55742aff1d289365589/trano-0.61.0.tar.gz", hash = "sha256:8af1d22c9b8418d48862e603a034e186908a4325025ebb95130bf4a10da0776f", size = 255999, upload-time = "2026-10-23T20:04:36.463Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/bb/5a628d52d786b4c770bc8f9e4f548cfb90acb428b2c691dbe2e8df7868a2/trano-0.64.0.tar.gz", hash = "sha256:c8495b7126d10fe2c113341ed8125b4578beaba9edfe5fce46f378e929a40dde", size = 256320, upload-time = "2026-10-24T05:14:16.043Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/1d/db4f3b78d95378c5510218b883b891454da365b15ed45f081abf2b98ff39/trano-0.61.0-py3-none-any.whl", hash = "sha256:9833b8635d6aaa758681e26867859217f3424fc9ad0c1890da2390bccb5ff71b", size = 312451, upload-time = "2026-10-23T20:04:35.068Z" },
+    { url = "https://files.pythonhosted.org/packages/7a/08/691c2b588c0cf3eec5285496c1e93f5b3a60fd1a8780b61285622b314bf6/trano-0.64.0-py3-none-any.whl", hash = "sha256:0b1c092809ef06288a54bda3956107a4189b126c867a9b2f54bb074f8b9664f2", size = 312756, upload-time = "2026-10-24T05:14:14.39Z" },
 ]
 
 [[package]]

@@ -47,7 +47,7 @@ dev = [{ include-group = "lint" }, { include-group = "rumoca" }]
 # study: the study against Buildings with the models trano generates (study/), and the documentation site
 study = [
     { include-group = "rumoca" },
-    "trano>=0.61,<1",
+    "trano>=0.64,<1",
     "trano-simulate>=0.2.0,<1",
     "trano-optimization>=0.3.0,<1",
     "pandas>=2.2,<3",
