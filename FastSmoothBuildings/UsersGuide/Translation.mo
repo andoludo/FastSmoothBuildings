@@ -30,8 +30,26 @@ declaration: rumoca 0.10.3 expands the loop of the function into extra equations
 ideal systems of the library call it this way).</li>
 </ul>
 <p>
-rumoca 0.10.3 from the commit <code>33c21141</code> of its main branch exports connected models to CasADi; the
-release 0.10.2 on PyPI does not.
+The release 0.10.3 of rumoca on PyPI keeps \"residual projection stages\" for five more shapes, which its CasADi
+target refuses (<code>residual_equations</code>, <code>initialization</code>); the library avoids them:
+</p>
+<ul>
+<li>in a function, a variable set by an if-expression and used by a later statement: one assignment per function,
+as <a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimit\">smoothLimit</a> calls
+<a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimitBelow\">smoothLimitBelow</a> and
+<a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimitAbove\">smoothLimitAbove</a>;</li>
+<li>in a function, a scalar reassigned in a loop (an accumulation, or a value passed to a smooth function): an array
+element per step, or one <code>sum</code>;</li>
+<li>in an equation, a smooth function of a smooth function (<code>smoothMin(a, smoothMax(b, c))</code>): the inner
+value in a variable of its own;</li>
+<li>in a <code>for</code> loop of equations, a derivative multiplied by a coefficient
+(<code>C[i]*der(T[i]) = Q[i]</code>): the derivative alone, <code>der(T[i]) = Q[i]/C[i]</code>;</li>
+<li>a parameter bound to an if-expression whose branch is more than a name or a literal: the branch in a parameter
+of its own.</li>
+</ul>
+<p>
+The library translates with rumoca 0.10.3 from PyPI and with the commit <code>33c21141</code> of its main branch;
+the release 0.10.2 does not export connected models to CasADi.
 </p>
 </html>"));
 end Translation;

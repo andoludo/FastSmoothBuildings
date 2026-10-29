@@ -21,8 +21,8 @@ protected
   Real y1(unit="m") "Vertical distance between the overhang and the lower edge of its shadow";
   Real x1(unit="m") "Horizontal distance between the window side and the corner of the shadow";
   Real ratio "y1/x1";
-  Real x2(unit="m") "Where the shadow line crosses the lower edge of a rectangle";
-  Real cut(unit="m");
+  Real x2[4](each unit="m") "Where the shadow line crosses the lower edge of each rectangle";
+  Real cut[4](each unit="m");
   Real area[4](each unit="m2") "Shaded areas of the rectangles";
   Real shdArea(unit="m2");
 algorithm
@@ -34,11 +34,11 @@ algorithm
   x1 := dep*sin(verAzi)/Utilities.smoothMax(cos(verAzi), 1e-3, 1e-4);
   ratio := y1/Utilities.smoothMax(x1, 1e-8*hWin, 1e-9*hWin);
   for i in 1:4 loop
-    x2 := x1*tmpH[i]/Utilities.smoothMax(y1, 1e-8*hWin, 1e-9*hWin);
-    cut := Utilities.smoothMin(x1, x2, del) - tmpW[i];
+    x2[i] := x1*tmpH[i]/Utilities.smoothMax(y1, 1e-8*hWin, 1e-9*hWin);
+    cut[i] := Utilities.smoothMin(x1, x2[i], del) - tmpW[i];
     area[i] := Utilities.smoothMin(y1, tmpH[i], del)*tmpW[i]
-      - Utilities.smoothMin(y1, tmpH[i], del)*Utilities.smoothMin(x2, y1, del)/2
-      + Utilities.smoothMax(ratio*cut, 0, del)*Utilities.smoothMax(cut, 0, del)/2;
+      - Utilities.smoothMin(y1, tmpH[i], del)*Utilities.smoothMin(x2[i], y1, del)/2
+      + Utilities.smoothMax(ratio*cut[i], 0, del)*Utilities.smoothMax(cut[i], 0, del)/2;
   end for;
   shdArea := area[4] + area[3] - area[2] - area[1];
   // all in the shade with the sun behind the wall or below the horizon

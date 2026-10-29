@@ -32,7 +32,7 @@ equation
   end for;
   for m in 1:nSub - nLay loop
     TNod[constructionType.sub[m]] = TSub[m];
-    C[constructionType.sub[m]]*der(TSub[m]) = QNod[constructionType.sub[m]];
+    der(TSub[m]) = QNod[constructionType.sub[m]]/C[constructionType.sub[m]];
   end for;
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={
       Rectangle(extent={{0,80},{80,-80}}, fillColor={175,175,175}, fillPattern=FillPattern.Solid,

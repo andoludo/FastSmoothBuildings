@@ -92,7 +92,7 @@ and its CasADi model integrated by CVODES follows the OpenModelica results withi
 ## Development
 
 ```bash
-uv sync                          # Python environment with rumoca (built from its git commit) and CasADi
+uv sync                          # Python environment with rumoca and CasADi
 uv run pytest                    # structure, bundle and rumoca tests
 uv run pytest -m openmodelica    # simulations of the examples in OpenModelica (Docker)
 uv run ruff check . && uv run ruff format --check . && uv run mypy

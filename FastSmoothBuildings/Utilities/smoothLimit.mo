@@ -7,11 +7,8 @@ function smoothLimit
   input Real u;
   input Real deltaX "Half width of the blends, below (u - l)/2";
   output Real y;
-protected
-  Real z "x limited from below";
 algorithm
-  z := if x > l + deltaX then x else if x < l - deltaX then l else l + (x - l + deltaX)^2/(4*deltaX);
-  y := if z < u - deltaX then z else if z > u + deltaX then u else u - (u + deltaX - z)^2/(4*deltaX);
+  y := smoothLimitAbove(smoothLimitBelow(x, l, deltaX), u, deltaX);
   annotation (Documentation(info="<html>
 <h4>Purpose</h4>
 <p>
@@ -21,8 +18,10 @@ the bounds beyond the blends, never outside them (see
 </p>
 <h4>Equations</h4>
 <p>
-With <i>&delta;</i> = <code>deltaX</code>, <i>x</i> is first limited from below to <i>z</i>, then <i>z</i> from
-above to <i>y</i>:
+With <i>&delta;</i> = <code>deltaX</code>, <i>x</i> is first limited from below to <i>z</i>
+(<a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimitBelow\">smoothLimitBelow</a>), then <i>z</i> from
+above to <i>y</i>
+(<a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimitAbove\">smoothLimitAbove</a>):
 </p>
 <table summary=\"Branches of smoothLimit\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\">
 <tr><th>Range</th><th>Value</th></tr>
@@ -48,6 +47,9 @@ Each parabola meets the constant bound with a zero slope and the identity with a
 </html>", revisions="<html>
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Utilities</code>.</li>
+<li>October 2026: the two limits are the functions smoothLimitBelow and smoothLimitAbove, one assignment each:
+rumoca after commit 33c2114 (0.10.3 on PyPI) cannot export a variable set by an if-expression and used by the next
+statement.</li>
 </ul>
 </html>"));
 end smoothLimit;

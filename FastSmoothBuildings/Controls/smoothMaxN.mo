@@ -3,11 +3,16 @@ function smoothMaxN "Smooth maximum of a vector"
   input Real u[:];
   input Real delta = 1e-3;
   output Real y;
+protected
+  Real m[size(u, 1)] "Smooth maximum of the first elements, up to each";
 algorithm
-  y := u[1];
+  // one element per step, not a scalar reassigned in the loop: rumoca after commit 33c2114 (0.10.3 on PyPI)
+  // cannot export the latter
+  m[1] := u[1];
   for i in 2:size(u, 1) loop
-    y := Utilities.smoothMax(y, u[i], delta);
+    m[i] := Utilities.smoothMax(m[i - 1], u[i], delta);
   end for;
+  y := m[size(u, 1)];
   annotation (Documentation(info="<html>
 <h4>Purpose</h4>
 <p>

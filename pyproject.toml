@@ -38,8 +38,8 @@ Issues = "https://github.com/andoludo/FastSmoothBuildings/issues"
 Changelog = "https://github.com/andoludo/FastSmoothBuildings/blob/main/CHANGELOG.md"
 
 [dependency-groups]
-# test: the layout, the bundle and the OpenModelica tests; rumoca: the translation into CasADi (rumoca is built
-# from its git commit, which takes minutes); lint: the static checks
+# test: the layout, the bundle and the OpenModelica tests; rumoca: the translation into CasADi (the release on PyPI;
+# the library also translates with the commit 33c2114 of rumoca's main branch); lint: the static checks
 test = ["numpy>=2,<3", "pytest>=9.0.3,<10"]
 rumoca = ["casadi>=3.6,<4", "rumoca>=0.10.3,<0.11"]
 lint = [{ include-group = "test" }, "mypy>=2.1.0,<3", "ruff>=0.15.16,<0.16"]
@@ -66,11 +66,6 @@ docs = [
 
 [tool.uv]
 default-groups = ["dev"]
-
-[tool.uv.sources]
-# rumoca 0.10.3 from its main branch, as trano-optimization: the release on PyPI (0.10.2) does not export connected
-# models to CasADi, and the later commits of main refuse the pressure-driven valves and the heat pump
-rumoca = { git = "https://github.com/CogniPilot/rumoca", rev = "33c21141791cbc341f4788ff6353d2f49d1c740a", subdirectory = "crates/rumoca-bind-python" }
 
 [build-system]
 requires = ["hatchling>=1.27"]

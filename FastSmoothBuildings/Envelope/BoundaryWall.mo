@@ -14,7 +14,7 @@ equation
   Q_b = propsBus_a.rad.Q_flow - QInt;
   for b in 2:nLay + 1 loop
     TNod[constructionType.nod[b]] = T[b - 1];
-    C[constructionType.nod[b]]*der(T[b - 1]) = QNod[constructionType.nod[b]];
+    der(T[b - 1]) = QNod[constructionType.nod[b]]/C[constructionType.nod[b]];
   end for;
   propsBus_a.con.Q_flow = -QInt;
   propsBus_a.rad.T = T[nLay];

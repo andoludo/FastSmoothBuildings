@@ -2,6 +2,8 @@ regStep
 smoothMax
 smoothMin
 smoothLimit
+smoothLimitBelow
+smoothLimitAbove
 smoothLimitInside
 positivePart
 naturalConvection

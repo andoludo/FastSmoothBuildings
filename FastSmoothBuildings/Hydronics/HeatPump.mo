@@ -26,8 +26,10 @@ model HeatPump
   parameter Real mCon_flow(unit="kg/s") = HeatPumps.Vitocal251A08.mCon_flow_nominal*scaFac "Condenser flow";
   parameter Real dTCon(unit="K") = Q_flow_nominal/cpWat/mCon_flow "Condenser outlet above the buffer at full speed";
   parameter Real VWat(unit="m3") = if useStorageTank then VTan else 1.5e-5*Q_flow_nominal "Water volume";
-  parameter Real UA(unit="W/K") = if useStorageTank then kIns/dIns*(2*pi*sqrt(VTan/(pi*hTan))*hTan
-    + 2*pi*VTan/(pi*hTan)) else 0 "Heat loss conductance of the buffer";
+  parameter Real UATan(unit="W/K") = kIns/dIns*(2*pi*sqrt(VTan/(pi*hTan))*hTan + 2*pi*VTan/(pi*hTan))
+    "Heat loss conductance of the buffer tank (its own parameter: rumoca after commit 33c2114, 0.10.3 on PyPI, cannot
+     export it inside the if-expression of UA)";
+  parameter Real UA(unit="W/K") = if useStorageTank then UATan else 0 "Heat loss conductance of the buffer";
   parameter Real C(unit="J/K") = (rhoWat*VWat + mCon_flow*tauCon)*cpWat "Heat capacity of the buffer and condenser";
   parameter Real T_start(unit="K") = TSet "Initial buffer temperature";
   Interfaces.RealInput y(unit="1") "Compressor speed, 0 to 1"

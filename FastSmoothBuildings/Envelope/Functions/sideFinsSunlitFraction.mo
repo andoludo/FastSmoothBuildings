@@ -22,8 +22,8 @@ protected
   Real lambda_t "Tangent of the angle between the horizontal and the sun's rays projected on the wall";
   Real y2(unit="m") "Vertical distance between the top of a fin and the corner of its shadow";
   Real x2(unit="m") "Horizontal distance between a fin and the corner of its shadow";
-  Real minX(unit="m");
-  Real minY(unit="m");
+  Real minX[4](each unit="m") "Width of the shadow in each rectangle";
+  Real minY[4](each unit="m") "Height of the shadow in each rectangle";
   Real area[4](each unit="m2") "Shaded areas of the rectangles";
   Real shdArea(unit="m2");
 algorithm
@@ -34,9 +34,9 @@ algorithm
   y2 := dep*alt_t/verAzi_c;
   x2 := dep*verAzi_t;
   for i in 1:4 loop
-    minX := Utilities.smoothMin(tmpH[i]/lambda_t, Utilities.smoothMin(x2, tmpW[i], del), del);
-    minY := Utilities.smoothMin(tmpH[i], Utilities.smoothMin(y2, tmpW[i]*lambda_t, del), del);
-    area[i] := tmpH[i]*minX - minX*minY/2;
+    minX[i] := Utilities.smoothMin(tmpH[i]/lambda_t, Utilities.smoothMin(x2, tmpW[i], del), del);
+    minY[i] := Utilities.smoothMin(tmpH[i], Utilities.smoothMin(y2, tmpW[i]*lambda_t, del), del);
+    area[i] := tmpH[i]*minX[i] - minX[i]*minY[i]/2;
   end for;
   shdArea := area[1] + area[4] - area[2] - area[3];
   // all in the shade with the sun behind the wall or below the horizon

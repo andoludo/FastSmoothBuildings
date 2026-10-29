@@ -18,11 +18,11 @@ algorithm
     v[j] := if heating then L[1]*QHea[1, j] + L[2]*QHea[2, j] + L[3]*QHea[3, j] else L[1]*PEle[1, j]
       + L[2]*PEle[2, j] + L[3]*PEle[3, j];
   end for;
-  y := v[1] + (v[2] - v[1])/(TSou[2] - TSou[1])*(TSource - TSou[1]);
-  for i in 2:8 loop
-    y := y + ((v[i + 1] - v[i])/(TSou[i + 1] - TSou[i]) - (v[i] - v[i - 1])/(TSou[i] - TSou[i - 1]))
-      *Utilities.positivePart(TSource - TSou[i], dTSou);
-  end for;
+  // one sum, not an accumulation in a loop: rumoca after commit 33c2114 (0.10.3 on PyPI) cannot export a scalar
+  // reassigned in a loop
+  y := v[1] + (v[2] - v[1])/(TSou[2] - TSou[1])*(TSource - TSou[1])
+    + sum(((v[i + 1] - v[i])/(TSou[i + 1] - TSou[i]) - (v[i] - v[i - 1])/(TSou[i] - TSou[i - 1]))
+      *Utilities.positivePart(TSource - TSou[i], dTSou) for i in 2:8);
   annotation (Documentation(info="<html>
 <h4>Purpose</h4>
 <p>

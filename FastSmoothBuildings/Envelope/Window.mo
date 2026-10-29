@@ -94,7 +94,7 @@ equation
   end for;
   QIn[nPan + 1] = QInt - propsBus_a.rad.Q_flow;
   for i in 1:nPan loop
-    CPan[i]*der(T[i]) = QAbs[i] + QIn[i] - QIn[i + 1];
+    der(T[i]) = (QAbs[i] + QIn[i] - QIn[i + 1])/CPan[i];
   end for;
   // the room air loses the heat that leaves through the frame and takes the heat of the inner pane
   propsBus_a.con.Q_flow = QFra - QInt;
