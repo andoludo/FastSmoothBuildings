@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0
+
+* The library translates into CasADi with rumoca 0.10.3 from PyPI, as with the commit 33c2114 of rumoca's main
+  branch: the shapes that this release refuses are rewritten, with the same equations (the reference results are
+  unchanged). `Utilities.smoothLimit` calls the new `Utilities.smoothLimitBelow` and `Utilities.smoothLimitAbove`;
+  the sunlit fractions of the windows and `Controls.smoothMaxN` keep a value per loop step; the heat pump table sums
+  its kinks in one expression; the walls and windows write `der(T) = Q/C` in their loops; the valve keeps its limited
+  opening in `yLim`, the heat pump control its bounded heating curve in `TCur`, the heat pump the conductance of its
+  tank in `UATan`. The development environment takes rumoca from PyPI: no Rust toolchain is needed any more.
+  `UsersGuide.Translation` lists the shapes.
+
 ## 0.5.0
 
 * Releases follow changes of what users install (the library, the Python package, `pyproject.toml`, `README.md`,

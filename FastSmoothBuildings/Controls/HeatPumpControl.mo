@@ -25,6 +25,7 @@ model HeatPumpControl
   Interfaces.RealOutput y(unit="1") "Compressor speed"
     annotation (Placement(transformation(extent={{100,-20},{140,20}})));
   Real TSupSet(unit="K") "Supply temperature set point (heating curve)";
+  Real TCur(unit="K") "Heating curve bounded below by TSupMin";
   Real TCon(unit="K", start=TSet, fixed=true) "Measured condenser outlet temperature";
   Real heaOn "Heating on";
   Hysteresis warOut(uLow=TOutHeaLim - 1, uHigh=TOutHeaLim + 1, u=TOut) "Outside the heating season";
@@ -32,8 +33,9 @@ model HeatPumpControl
   PI conCom(k=kCom, Ti=TiCom, yMin=yComMin, yMax=1, yReset=yComMin, dY=dY, e=TSupSet + dTHys - TCon,
     enable=heaOn);
 equation
-  TSupSet = Utilities.smoothMin(TSet, Utilities.smoothMax(TSupMin, TSet + (TSupMin - TSet)*(TOut - TOutDes)
-    /(TOutHeaLim - TOutDes), dT), dT);
+  // the two bounds in two equations: rumoca after commit 33c2114 (0.10.3 on PyPI) cannot export the nested calls
+  TCur = Utilities.smoothMax(TSupMin, TSet + (TSupMin - TSet)*(TOut - TOutDes)/(TOutHeaLim - TOutDes), dT);
+  TSupSet = Utilities.smoothMin(TSet, TCur, dT);
   tauSen*der(TCon) = TConOut - TCon;
   heaOn = demand*(1 - warOut.y)*bufCha.y;
   y = heaOn*conCom.y;

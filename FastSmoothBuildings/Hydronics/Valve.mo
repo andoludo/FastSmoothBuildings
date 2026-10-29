@@ -14,11 +14,15 @@ model Valve
   Interfaces.RealInput y(unit="1") "Flow relative to the nominal flow (set flows), or opening (pressure-driven)"
     annotation (Placement(transformation(extent={{-20,-20},{20,20}}, rotation=270, origin={0,120})));
   Real G(unit="kg/(s.Pa)") "Conductance (pressure-driven flows)";
+  Real yLim(unit="1") "Opening limited to [0, 1] (pressure-driven flows)";
 equation
   TOut = TIn;
+  // the limited opening is a variable of its own: rumoca after commit 33c2114 (0.10.3 on PyPI) cannot export the
+  // characteristic of an opening limited in the same equation
+  yLim = Utilities.smoothLimit(y, 0, 1, 1e-3);
   if pressureDriven then
-    G = Utilities.valveConductance(Utilities.equalPercentage(Utilities.smoothLimit(y, 0, 1, 1e-3), R, l, delta0),
-      m_flow_nominal, dpValve_nominal, dpFixed_nominal);
+    G = Utilities.valveConductance(Utilities.equalPercentage(yLim, R, l, delta0), m_flow_nominal, dpValve_nominal,
+      dpFixed_nominal);
     for i in 1:nPorts_b loop
       port_b[i].m_flow = -G/nPorts_b*(pIn - port_b[i].p);
     end for;
