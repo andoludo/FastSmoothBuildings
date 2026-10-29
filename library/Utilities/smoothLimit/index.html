@@ -16,7 +16,7 @@
         <link rel="prev" href="../smoothMin/">
       
       
-        <link rel="next" href="../smoothLimitInside/">
+        <link rel="next" href="../smoothLimitBelow/">
       
       
         
@@ -1850,6 +1850,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -2067,6 +2071,62 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smoothLimitBelow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    smoothLimitBelow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smoothLimitAbove/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    smoothLimitAbove
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2436,7 +2496,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6_20" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2458,14 +2518,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_1_6_18" id="__nav_3_1_6_18_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_1_6_20" id="__nav_3_1_6_20_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_6_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1_6_18">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_6_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_6_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6721,8 +6781,10 @@ the bounds beyond the blends, never outside them (see
 </p>
 <h4>Equations</h4>
 <p>
-With <i>&delta;</i> = <code>deltaX</code>, <i>x</i> is first limited from below to <i>z</i>, then <i>z</i> from
-above to <i>y</i>:
+With <i>&delta;</i> = <code>deltaX</code>, <i>x</i> is first limited from below to <i>z</i>
+(<a href="../smoothLimitBelow/">smoothLimitBelow</a>), then <i>z</i> from
+above to <i>y</i>
+(<a href="../smoothLimitAbove/">smoothLimitAbove</a>):
 </p>
 <table summary="Branches of smoothLimit" border="1" cellspacing="0" cellpadding="2">
 <tr><th>Range</th><th>Value</th></tr>
@@ -6751,6 +6813,9 @@ Each parabola meets the constant bound with a zero slope and the identity with a
 <div markdown="0">
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Utilities</code>.</li>
+<li>October 2026: the two limits are the functions smoothLimitBelow and smoothLimitAbove, one assignment each:
+rumoca after commit 33c2114 (0.10.3 on PyPI) cannot export a variable set by an if-expression and used by the next
+statement.</li>
 </ul>
 </div>
 

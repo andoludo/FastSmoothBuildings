@@ -1848,6 +1848,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1999,6 +2003,62 @@
     
   
     smoothLimit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Utilities/smoothLimitBelow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    smoothLimitBelow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Utilities/smoothLimitAbove/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    smoothLimitAbove
   
 
     
@@ -2376,7 +2436,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6_20" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2398,14 +2458,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_1_6_18" id="__nav_3_1_6_18_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_1_6_20" id="__nav_3_1_6_20_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_6_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1_6_18">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_6_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_6_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6942,10 +7002,17 @@ radiators in closed loop.
 <td>Water volume</td>
 </tr>
 <tr>
+<td>UATan</td>
+<td>Real</td>
+<td>W/K</td>
+<td>kIns/dIns<em>(2</em>pi<em>sqrt(VTan/(pi</em>hTan))<em>hTan + 2</em>pi<em>VTan/(pi</em>hTan))</td>
+<td>Heat loss conductance of the buffer tank (its own parameter: rumoca after commit 33c2114, 0.10.3 on PyPI, cannot export it inside the if-expression of UA)</td>
+</tr>
+<tr>
 <td>UA</td>
 <td>Real</td>
 <td>W/K</td>
-<td>if useStorageTank then kIns/dIns<em>(2</em>pi<em>sqrt(VTan/(pi</em>hTan))<em>hTan + 2</em>pi<em>VTan/(pi</em>hTan)) else 0</td>
+<td>if useStorageTank then UATan else 0</td>
 <td>Heat loss conductance of the buffer</td>
 </tr>
 <tr>
