@@ -248,6 +248,7 @@ T_{in} = \frac{\sum_k \dot m_k T_k + \dot m_{small}\, \overline{T_k}}{\sum_k \do
 | `Junction`, `Junction2` | mass balance; the outlets leave at the mixed temperature of the inlets |
 | `Pump` | pass-through; electrical power \(P = \Delta p_{nom}\,\dot m / (\rho\,\eta)\) |
 | `TemperatureSensor` | pass-through; \(T\) is the water temperature (no sensor dynamics) |
+| `HeatMeter` | pass-through; \(\dot Q = \dot m\, c_p\,(T - T_{ext})\), the heat carried above the temperature of the other pipe (Buildings `Fluid.Sensors.HeatMeter`) |
 
 **Pressure-driven flows** (`FastSmoothBuildings`, the parameter `pressureDriven` of every component): each component has a
 pressure node at its inlet, of small compliance, whose pressure \(p_{in}\) is a state; the flow of each outlet is

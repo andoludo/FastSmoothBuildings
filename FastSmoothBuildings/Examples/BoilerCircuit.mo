@@ -54,9 +54,11 @@ model BoilerCircuit "Room heated by a gas boiler and a radiator, in closed loop 
     dpFixed_nominal={2000, 0}) "Mixing valve of the supply";
   FastSmoothBuildings.Controls.ThreeWayValveControl supplyControl(TColSet=363.15)
     "Supply set point above the boiler: the valve stays open, as in trano's circuits";
-  FastSmoothBuildings.Hydronics.TemperatureSensor supply(pressureDriven=pressureDriven, m_flow_nominal=0.15)
-    "Supply temperature";
+  FastSmoothBuildings.Hydronics.HeatMeter supply(pressureDriven=pressureDriven, m_flow_nominal=0.15,
+    TExt=valve.TOut) "Supply temperature, and the heat the circuit delivers to the radiator";
+  Real EMet(unit="kWh", start=0, fixed=true) "Metered heat";
 equation
+  der(EMet) = supply.Q_flow/3.6e6;
   connect(zone.heaPorAir, radiator.heatPortCon);
   connect(zone.heaPorRad, radiator.heatPortRad);
   connect(radiator.port_b[1], valve.port_a[1]);
@@ -77,7 +79,10 @@ equation
 The circuit of trano's single-zone hydronic test, in closed loop: a gas boiler held at 80 &deg;C, a pump whose
 speed follows the opening of the valve, a three-way valve (open: its set point is above the boiler), a radiator and its
 valve, opened by a PI room controller (21 &deg;C by day, 16 &deg;C at night). The flows follow the pressures of
-the circuit: a pressure node at the inlet of every component, the pump on its curve.
+the circuit: a pressure node at the inlet of every component, the pump on its curve. The supply is read by a
+<a href=\"modelica://FastSmoothBuildings.Hydronics.HeatMeter\">HeatMeter</a>, which also meters the heat the
+water leaves in the radiator and its valve (its <code>TExt</code> is the return temperature); <code>EMet</code>
+is its integral in kWh.
 </p>
 </html>"));
 end BoilerCircuit;

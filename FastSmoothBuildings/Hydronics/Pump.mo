@@ -15,15 +15,18 @@ protected
   constant Real a = 1.14 "Head at zero flow, relative";
   constant Real b = 0.08 "Quadratic fit of the curve through (0, 1.14), (1, 1), (2, 0.42)";
   constant Real c = -0.22;
+  constant Real xMin = 1e-10 "Floor of the argument of the root of the curve";
   Real x[nPorts_b] "Flow of each outlet relative to y*m_flow_nominal/nPorts_b";
 equation
   TOut = TIn;
   dp = sum(port_b[i].p for i in 1:nPorts_b)/nPorts_b - pIn;
   if pressureDriven then
     for i in 1:nPorts_b loop
-      // beyond the shut-off head the flow stays at the top of the curve: the root takes a positive argument
-      x[i] = (-b - sqrt(Utilities.positivePart(b^2 - 4*c*(a - (port_b[i].p - pIn)/dp_nominal/(y^2 + 1e-4)), 1e-3)))
-        /(2*c);
+      // beyond the shut-off head the flow stays at the top of the curve: the root takes a positive argument. Far
+      // beyond it (a pump at rest against the head of another one) the positive part rounds to zero, where the root
+      // has no slope: xMin keeps the argument above zero and the Jacobian finite
+      x[i] = (-b - sqrt(Utilities.positivePart(b^2 - 4*c*(a - (port_b[i].p - pIn)/dp_nominal/(y^2 + 1e-4)), 1e-3)
+        + xMin))/(2*c);
       port_b[i].m_flow = -y*m_flow_nominal/nPorts_b*x[i];
     end for;
     // the forward flow and head only: while the pressures settle, the pump draws no negative power

@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+* `Controls.HeatPumpControl`: the minimum on and off times of the compressor (`minOnTime`, `minOffTime`, 300 s as
+  the safety control of the Buildings heat pump of trano), which were not modelled. The compressor is a bistable
+  state `heaOn` that follows the request (demand, heating season, buffer charging) and stays on until it has run
+  `minOnTime` and off until it has been off `minOffTime`, without an event: two shares ramp with the time in each
+  state and release the switch after the minimum time, within 1 %. The reference results of
+  `Examples.HeatPumpCircuit` change: the room temperature moves by at most 0.09 K.
+* `Hydronics.HeatMeter`: a pass-through that meters the heat the water carries above the temperature `TExt` of the
+  other pipe, as `Buildings.Fluid.Sensors.HeatMeter` (`Q_flow`), and gives its temperature `T` like
+  `TemperatureSensor`. It reads the supply of `Examples.BoilerCircuit`, whose reference results gain `supply.Q_flow`
+  and the metered heat `EMet`; the other variables are unchanged.
+* `Hydronics.Pump`: the argument of the root of the pump curve keeps a floor of 1e-10. Far beyond the shut-off head
+  (a pump at rest against the head of another pump in series) the positive part rounded to zero, where the root has
+  no slope: the Jacobian held NaN and CVODES stopped. The reference results of the two examples with a cycling
+  generator move at a few instants, where a switch falls on the other side of an output point (`supply.Q_flow` at
+  1 point of 290 in `Examples.BoilerCircuit`; `heatPump.y` and `heatPump.PEle` at 7 points of 290 in
+  `Examples.HeatPumpCircuit`); their means change by less than 1e-4 of their ranges.
+
 ## 0.6.0
 
 * The library translates into CasADi with rumoca 0.10.3 from PyPI, as with the commit 33c2114 of rumoca's main

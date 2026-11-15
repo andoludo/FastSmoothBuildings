@@ -82,6 +82,21 @@ def test_the_casadi_model_follows_the_reference_results(case: Case) -> None:
         assert difference < case.casadi_tolerance, f"{state}: {difference}"
 
 
+def test_a_pump_at_rest_far_beyond_its_shut_off_head_keeps_a_finite_jacobian() -> None:
+    """A pump at rest against the head of another pump (two pumps in series, one throttled by its collector control):
+    the positive part under the root of the pump curve rounds to zero there, and the root has no slope at zero."""
+    case = next(case for case in CASES if case.name == "Examples.BoilerCircuit")
+    export = translate(wrapper(case), "Wrapper")
+    names = [str(name) for name in export.state_names]
+    states, inputs, parameters = defaults(export)
+    states[names.index("pump.pIn")] = -1e6  # the head across the pump: far above 1.14 times its nominal 30 kPa
+    states[names.index("collector.hysPum.y")] = 0.0  # the pump is off
+    x = ca.SX.sym("x", states.size)
+    jacobian = ca.Function("jacobian", [x], [ca.jacobian(export.rhs(0.0, x, inputs, parameters), x)])
+    assert np.all(np.isfinite(np.asarray(jacobian(states), dtype=float)))
+    assert np.all(np.isfinite(derivatives(export, 0.0, states, inputs, parameters)))
+
+
 PROBE = """
 model Probe
   input Real u1;

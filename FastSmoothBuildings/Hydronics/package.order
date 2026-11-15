@@ -3,6 +3,7 @@ PartialConserving
 PartialLink
 Pipe
 TemperatureSensor
+HeatMeter
 Pump
 Valve
 ThreeWayValve
