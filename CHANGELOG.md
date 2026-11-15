@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.0
 
 * `Controls.HeatPumpControl`: the minimum on and off times of the compressor (`minOnTime`, `minOffTime`, 300 s as
   the safety control of the Buildings heat pump of trano), which were not modelled. The compressor is a bistable
