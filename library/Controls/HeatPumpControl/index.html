@@ -4277,6 +4277,8 @@
       
         
       
+        
+      
     
     
     
@@ -4456,6 +4458,34 @@
     
   
     TemperatureSensor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Hydronics/HeatMeter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HeatMeter
   
 
     
@@ -4719,7 +4749,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_12_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_12_16" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -4741,14 +4771,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_1_12_15" id="__nav_3_1_12_15_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_1_12_16" id="__nav_3_1_12_16_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_12_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1_12_15">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_12_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_12_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4788,7 +4818,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_12_15_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_12_16_2" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -4810,14 +4840,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_1_12_15_2" id="__nav_3_1_12_15_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_1_12_16_2" id="__nav_3_1_12_16_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_1_12_15_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1_12_15_2">
+        <nav class="md-nav" data-md-level="5" aria-labelledby="__nav_3_1_12_16_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_12_16_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6792,14 +6822,14 @@
 
 
 <h1 id="heatpumpcontrol">HeatPumpControl<a class="headerlink" href="#heatpumpcontrol" title="Permanent link">&para;</a></h1>
-<p><em>Control of trano&#x27;s air-to-water heat pump (Buildings model): heating curve, heating season, buffer charged between TSupSet - dTHys/2 and TSupSet + dTHys/2, compressor PI on the condenser outlet towards TSupSet + dTHys (minimum speed yComMin); the minimum on and off times of the safety control are not modelled</em></p>
+<p><em>Control of trano&#x27;s air-to-water heat pump (Buildings model): heating curve, heating season, buffer charged between TSupSet - dTHys/2 and TSupSet + dTHys/2, compressor PI on the condenser outlet towards TSupSet + dTHys (minimum speed yComMin), held on at least minOnTime once started and off at least minOffTime once stopped</em></p>
 <p><code>FastSmoothBuildings.Controls.HeatPumpControl</code>, model (<a href="https://github.com/andoludo/FastSmoothBuildings/blob/main/FastSmoothBuildings/Controls/HeatPumpControl.mo">source</a>)</p>
 <div class="modelica-documentation" markdown="0">
 <h4>Purpose</h4>
 <p>
 Control of trano's air-to-water heat pump (Buildings model): a heating curve, a heating season, the charging of the
-buffer within a band and a PI controller of the compressor speed on the condenser outlet. The minimum on and off
-times of the safety control are not modelled.
+buffer within a band, a PI controller of the compressor speed on the condenser outlet and the minimum on and off
+times of the safety control.
 </p>
 <h4>Equations</h4>
 <p>
@@ -6830,8 +6860,27 @@ measurement:
 Compressor:
 </p>
 <p>
-<i>heaOn</i> = <i>demand</i> (1 &minus; <code>warOut.y</code>) <code>bufCha.y</code>, &nbsp;
+<i>heaReq</i> = <i>demand</i> (1 &minus; <code>warOut.y</code>) <code>bufCha.y</code>, &nbsp;
 <i>y</i> = <i>heaOn</i> <code>conCom.y</code>,
+</p>
+<p>
+<i>heaOn</i> is the state of the compressor, a bistable state as the hystereses: it follows the request
+<i>heaReq</i>, except that it stays on until it has run <code>minOnTime</code> and off until it has been off
+<code>minOffTime</code> (the safety control of the Buildings model, without an event):
+</p>
+<p>
+<i>&tau;<sub>Swi</sub></i> d<i>heaOn</i>/d<i>t</i> = regStep(<i>heaTar</i> &minus; 0.5, 1, 0, 0.25) &minus;
+<i>heaOn</i>, &nbsp; <i>heaTar</i> = <i>heaOn</i> (1 &minus; (1 &minus; <i>heaReq</i>) <i>mayStop</i>) +
+(1 &minus; <i>heaOn</i>) <i>heaReq</i> <i>mayStart</i>.
+</p>
+<p>
+<i>aOn</i> ramps from 0 at the rate 1/<code>minOnTime</code> while the compressor runs (<i>heaOn</i> above 0.9),
+up to 1.05, and falls back to 0 within <i>&tau;<sub>Swi</sub></i> once it is off (<i>heaOn</i> below 0.1);
+<i>mayStop</i> goes from 0 to 1 as <i>aOn</i> passes 1, that is after <code>minOnTime</code> within 1 %.
+<i>aOff</i> and <i>mayStart</i> do the same for the time off; the compressor may start at the beginning
+(<i>aOff</i>(0) = 1.05). Neither share moves while the compressor switches, so the
+permission that started a switch holds until the switch is done. A minimum time shorter than
+<i>&tau;<sub>Swi</sub></i> counts as <i>&tau;<sub>Swi</sub></i>.
 </p>
 <p>
 <code>conCom</code> a <a href="../PI/">PI</a> controller of the error
@@ -6851,6 +6900,9 @@ time constants: the control has no event.
 <tr><td><code>kCom</code>, <code>TiCom</code></td><td>0.1, 300 s</td>
 <td>gain and integral time of the compressor controller</td></tr>
 <tr><td><code>yComMin</code></td><td>0.3</td><td>minimum compressor speed</td></tr>
+<tr><td><code>minOnTime</code>, <code>minOffTime</code></td><td>300 s, 300 s</td>
+<td>minimum time the compressor runs once started and stays off once stopped</td></tr>
+<tr><td><code>tauSwi</code></td><td>10 s</td><td>switching time of the compressor</td></tr>
 <tr><td><code>tauSen</code></td><td>30 s</td><td>time constant of the condenser outlet temperature</td></tr>
 <tr><td><code>dT</code></td><td>0.1 K</td><td>width of the smooth limits of the heating curve</td></tr>
 <tr><td><code>dY</code></td><td>10<sup>&minus;3</sup> (1 &minus; <code>yComMin</code>)</td>
@@ -6936,6 +6988,41 @@ In <a href="../../Examples/HeatPumpCircuit/">Examples.HeatPumpCircuit</a>, the d
 <td></td>
 <td>0.3</td>
 <td>Minimum compressor speed</td>
+</tr>
+<tr>
+<td>minOnTime</td>
+<td>Real</td>
+<td>s</td>
+<td>300</td>
+<td>Minimum time the compressor runs once started</td>
+</tr>
+<tr>
+<td>minOffTime</td>
+<td>Real</td>
+<td>s</td>
+<td>300</td>
+<td>Minimum time the compressor stays off once stopped</td>
+</tr>
+<tr>
+<td>tauSwi</td>
+<td>Real</td>
+<td>s</td>
+<td>10</td>
+<td>Switching time of the compressor</td>
+</tr>
+<tr>
+<td>tOn</td>
+<td>Real</td>
+<td>s</td>
+<td>if minOnTime &gt; tauSwi then minOnTime else tauSwi</td>
+<td>Time of the ramp of aOn: the minimum on time, at least the switching time</td>
+</tr>
+<tr>
+<td>tOff</td>
+<td>Real</td>
+<td>s</td>
+<td>if minOffTime &gt; tauSwi then minOffTime else tauSwi</td>
+<td>Time of the ramp of aOff: the minimum off time, at least the switching time</td>
 </tr>
 <tr>
 <td>tauSen</td>
