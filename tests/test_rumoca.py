@@ -131,6 +131,26 @@ def test_the_smooth_limit_reaches_its_bounds_and_stays_inside(x: float, expected
     assert value == pytest.approx(expected, abs=1e-12)
 
 
+def pump_flow(head: float) -> float:
+    return float(probe(["FastSmoothBuildings.Utilities.pumpFlow(u1)"], [head, 0, 0])[0])
+
+
+@pytest.mark.parametrize(("head", "flow"), [(1.0, 1.0), (0.42, 2.0)])
+def test_the_pump_curve_goes_through_the_points_of_buildings(head: float, flow: float) -> None:
+    assert pump_flow(head) == pytest.approx(flow, rel=1e-6)
+
+
+def test_the_pump_curve_falls_to_no_flow_at_the_shut_off_head() -> None:
+    """Decreasing everywhere: one flow for each head, and against closed valves (a head above the shut-off head of
+    1.14) almost no flow, where the parabola through the same points kept 0.18 times the nominal flow at any head."""
+    heads = np.linspace(-0.5, 2.0, 101)
+    flows = np.array([pump_flow(h) for h in heads])
+    assert np.all(np.diff(flows) < 0)
+    assert pump_flow(1.14) < 0.04
+    assert pump_flow(1.15) < 0.01
+    assert pump_flow(1.5) < 1e-3
+
+
 def en673_gap_conductance(thickness: float, eps_a: float, eps_b: float) -> float:
     """Conductance of an air gap after EN 673 at its mean temperature (283 K) with 15 K across it."""
     mean, sigma, gravity, conductivity, density, capacity = 283.0, 5.670374419e-8, 9.81, 0.025, 1.2, 1006.0

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.8.0
+
+* `Hydronics.Pump`: with pressure-driven flows the flow follows a decreasing curve through the same points as
+  `Buildings.Fluid.Movers.Preconfigured.SpeedControlled_y` (1.14, 1 and 0.42 times `dp_nominal` at 0, 1 and 2 times
+  the nominal flow), `h = 1.14 - 0.14 x^2.3626`, inverted by the new function `Utilities.pumpFlow`. The parabola
+  through these points rose from 1.14 to 1.147 between no flow and 0.18 times the nominal flow: beyond its top the
+  pump kept 0.18 times its nominal flow whatever the head. A pump running against closed valves (a constant-speed
+  pump, or one whose control lags its valves) pushed that flow through them, the pressures of the circuit rose
+  without bound (hundreds of bar over a few weeks) and the radiators behind the closed valves kept heating. The flow
+  now falls to zero beyond the shut-off head; at the nominal flow and at twice it the pump is unchanged.
+  The reference results of the two examples with pressure-driven flows change: their means by less than 1 %
+  (room temperature 0.04 K at most, metered heat -0.9 % in `Examples.BoilerCircuit`, electricity of the heat pump
+  -0.4 % in `Examples.HeatPumpCircuit`); instant by instant more, where a cycling generator switches at another
+  time.
+
 ## 0.7.0
 
 * `Controls.HeatPumpControl`: the minimum on and off times of the compressor (`minOnTime`, `minOffTime`, 300 s as

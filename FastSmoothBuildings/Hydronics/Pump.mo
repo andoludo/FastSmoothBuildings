@@ -1,8 +1,8 @@
 within FastSmoothBuildings.Hydronics;
 model Pump
-  "Pump: pass-through with set flows; with pressure-driven flows, the flow at its head from the curve of
-   Buildings.Fluid.Movers.Preconfigured.SpeedControlled_y (1.14, 1 and 0.42 times dp_nominal at 0, 1 and 2 times
-   the nominal flow), scaled to the speed y by the affinity laws"
+  "Pump: pass-through with set flows; with pressure-driven flows, the flow at its head from a decreasing curve through
+   the points of Buildings.Fluid.Movers.Preconfigured.SpeedControlled_y (1.14, 1 and 0.42 times dp_nominal at 0, 1
+   and 2 times the nominal flow), scaled to the speed y by the affinity laws"
   extends PartialConserving(final GHyd=m_flow_nominal/dp_nominal);
   parameter Real dp_nominal(unit="Pa") = 3e4 "Pressure head at the nominal flow";
   parameter Real m_flow_nominal(unit="kg/s") = 1 "Nominal flow";
@@ -12,21 +12,14 @@ model Pump
   Real dp(unit="Pa") "Head";
   Real P(unit="W") "Electrical power";
 protected
-  constant Real a = 1.14 "Head at zero flow, relative";
-  constant Real b = 0.08 "Quadratic fit of the curve through (0, 1.14), (1, 1), (2, 0.42)";
-  constant Real c = -0.22;
-  constant Real xMin = 1e-10 "Floor of the argument of the root of the curve";
   Real x[nPorts_b] "Flow of each outlet relative to y*m_flow_nominal/nPorts_b";
 equation
   TOut = TIn;
   dp = sum(port_b[i].p for i in 1:nPorts_b)/nPorts_b - pIn;
   if pressureDriven then
     for i in 1:nPorts_b loop
-      // beyond the shut-off head the flow stays at the top of the curve: the root takes a positive argument. Far
-      // beyond it (a pump at rest against the head of another one) the positive part rounds to zero, where the root
-      // has no slope: xMin keeps the argument above zero and the Jacobian finite
-      x[i] = (-b - sqrt(Utilities.positivePart(b^2 - 4*c*(a - (port_b[i].p - pIn)/dp_nominal/(y^2 + 1e-4)), 1e-3)
-        + xMin))/(2*c);
+      // beyond the shut-off head the flow falls to zero (Utilities.pumpFlow)
+      x[i] = Utilities.pumpFlow((port_b[i].p - pIn)/dp_nominal/(y^2 + 1e-4));
       port_b[i].m_flow = -y*m_flow_nominal/nPorts_b*x[i];
     end for;
     // the forward flow and head only: while the pressures settle, the pump draws no negative power
@@ -66,20 +59,14 @@ With set flows, what enters leaves, and the electrical power is taken at the nom
 </p>
 <p>
 With pressure-driven flows, the head of the pump relative to <i>&Delta;p<sub>0</sub></i> = <code>dp_nominal</code>
-follows a parabola in the flow relative to the nominal flow, <i>x</i>, through the points (0, 1.14), (1, 1) and
-(2, 0.42):
+falls with the flow relative to the nominal flow, <i>x</i>, as <i>h</i>(<i>x</i>) = 1.14 &minus; 0.14
+<i>x</i><sup>2.3626</sup>, through the points (0, 1.14), (1, 1) and (2, 0.42), scaled to the speed <i>y</i> by the
+affinity laws (flow as <i>y</i>, head as <i>y</i><sup>2</sup>). For each of the <i>n<sub>b</sub></i> outlets, the
+flow is that of the curve at the head of that outlet,
+<a href=\"modelica://FastSmoothBuildings.Utilities.pumpFlow\">Utilities.pumpFlow</a>:
 </p>
 <p>
-<i>h</i>(<i>x</i>) = <i>a</i> + <i>b</i> <i>x</i> + <i>c</i> <i>x</i><sup>2</sup>, &nbsp;
-<i>a</i> = 1.14, <i>b</i> = 0.08, <i>c</i> = &minus;0.22,
-</p>
-<p>
-scaled to the speed <i>y</i> by the affinity laws (flow as <i>y</i>, head as <i>y</i><sup>2</sup>). For each of
-the <i>n<sub>b</sub></i> outlets, the flow is the root of the parabola at the head of that outlet:
-</p>
-<p>
-<i>x<sub>j</sub></i> = (&minus;<i>b</i> &minus; &radic;positivePart(<i>b</i><sup>2</sup> &minus; 4 <i>c</i>
-(<i>a</i> &minus; <i>h<sub>j</sub></i>), 10<sup>&minus;3</sup>)) / (2 <i>c</i>), &nbsp;
+<i>x<sub>j</sub></i> = pumpFlow(<i>h<sub>j</sub></i>), &nbsp;
 <i>h<sub>j</sub></i> = (<i>p<sub>b,j</sub></i> &minus; <i>p<sub>in</sub></i>) /
 (<i>&Delta;p<sub>0</sub></i> (<i>y</i><sup>2</sup> + 10<sup>&minus;4</sup>)),
 </p>
@@ -88,8 +75,8 @@ the <i>n<sub>b</sub></i> outlets, the flow is the root of the parabola at the he
 <i>n<sub>b</sub></i>.
 </p>
 <p>
-Beyond the shut-off head the argument of the root would be negative: positivePart keeps it positive and the flow
-stays at the top of the curve. The 10<sup>&minus;4</sup> keeps the relative head defined at <i>y</i> = 0. The
+Beyond the shut-off head the flow falls to zero: a pump against closed valves passes nothing and its head stays
+near the shut-off head. The 10<sup>&minus;4</sup> keeps the relative head defined at <i>y</i> = 0. The
 power counts the forward head and flow only, <i>P</i> = positivePart(<code>dp</code>, 1) <code>mTra</code> /
 (<i>&rho;</i> <i>&eta;</i>), so the pump draws no negative power while the pressures settle. The compliance of the
 inlet node is scaled by <code>m_flow_nominal</code>/<code>dp_nominal</code>.
@@ -109,6 +96,9 @@ the opening of the radiator valve through
 </html>", revisions="<html>
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Hydronics</code>.</li>
+<li>November 2026: the curve is decreasing (Utilities.pumpFlow). The parabola through the same points rose
+between no flow and 0.18 times the nominal flow: beyond its top the pump kept that flow whatever the head, and
+against closed valves the pressures of the circuit rose without bound.</li>
 </ul>
 </html>"));
 end Pump;

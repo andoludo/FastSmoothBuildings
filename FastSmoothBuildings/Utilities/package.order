@@ -12,6 +12,7 @@ polynomialFit
 equalPercentage
 valveConductance
 quadraticFlow
+pumpFlow
 timeOfDay
 occupancy
 dayTable
