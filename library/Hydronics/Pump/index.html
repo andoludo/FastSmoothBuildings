@@ -1852,6 +1852,8 @@
       
         
       
+        
+      
     
     
     
@@ -2303,6 +2305,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../Utilities/pumpFlow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pumpFlow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../Utilities/timeOfDay/" class="md-nav__link">
         
   
@@ -2436,7 +2466,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_6_21" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -2458,14 +2488,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_1_6_20" id="__nav_3_1_6_20_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_1_6_21" id="__nav_3_1_6_21_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_6_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1_6_20">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_1_6_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1_6_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6822,7 +6852,7 @@
 
 
 <h1 id="pump">Pump<a class="headerlink" href="#pump" title="Permanent link">&para;</a></h1>
-<p><em>Pump: pass-through with set flows; with pressure-driven flows, the flow at its head from the curve of Buildings.Fluid.Movers.Preconfigured.SpeedControlled_y (1.14, 1 and 0.42 times dp_nominal at 0, 1 and 2 times the nominal flow), scaled to the speed y by the affinity laws</em></p>
+<p><em>Pump: pass-through with set flows; with pressure-driven flows, the flow at its head from a decreasing curve through the points of Buildings.Fluid.Movers.Preconfigured.SpeedControlled_y (1.14, 1 and 0.42 times dp_nominal at 0, 1 and 2 times the nominal flow), scaled to the speed y by the affinity laws</em></p>
 <p><code>FastSmoothBuildings.Hydronics.Pump</code>, model (<a href="https://github.com/andoludo/FastSmoothBuildings/blob/main/FastSmoothBuildings/Hydronics/Pump.mo">source</a>)</p>
 <p>Extends <code>PartialConserving</code>.</p>
 <div class="modelica-documentation" markdown="0">
@@ -6846,20 +6876,14 @@ With set flows, what enters leaves, and the electrical power is taken at the nom
 </p>
 <p>
 With pressure-driven flows, the head of the pump relative to <i>&Delta;p<sub>0</sub></i> = <code>dp_nominal</code>
-follows a parabola in the flow relative to the nominal flow, <i>x</i>, through the points (0, 1.14), (1, 1) and
-(2, 0.42):
+falls with the flow relative to the nominal flow, <i>x</i>, as <i>h</i>(<i>x</i>) = 1.14 &minus; 0.14
+<i>x</i><sup>2.3626</sup>, through the points (0, 1.14), (1, 1) and (2, 0.42), scaled to the speed <i>y</i> by the
+affinity laws (flow as <i>y</i>, head as <i>y</i><sup>2</sup>). For each of the <i>n<sub>b</sub></i> outlets, the
+flow is that of the curve at the head of that outlet,
+<a href="../../Utilities/pumpFlow/">Utilities.pumpFlow</a>:
 </p>
 <p>
-<i>h</i>(<i>x</i>) = <i>a</i> + <i>b</i> <i>x</i> + <i>c</i> <i>x</i><sup>2</sup>, &nbsp;
-<i>a</i> = 1.14, <i>b</i> = 0.08, <i>c</i> = &minus;0.22,
-</p>
-<p>
-scaled to the speed <i>y</i> by the affinity laws (flow as <i>y</i>, head as <i>y</i><sup>2</sup>). For each of
-the <i>n<sub>b</sub></i> outlets, the flow is the root of the parabola at the head of that outlet:
-</p>
-<p>
-<i>x<sub>j</sub></i> = (&minus;<i>b</i> &minus; &radic;positivePart(<i>b</i><sup>2</sup> &minus; 4 <i>c</i>
-(<i>a</i> &minus; <i>h<sub>j</sub></i>), 10<sup>&minus;3</sup>)) / (2 <i>c</i>), &nbsp;
+<i>x<sub>j</sub></i> = pumpFlow(<i>h<sub>j</sub></i>), &nbsp;
 <i>h<sub>j</sub></i> = (<i>p<sub>b,j</sub></i> &minus; <i>p<sub>in</sub></i>) /
 (<i>&Delta;p<sub>0</sub></i> (<i>y</i><sup>2</sup> + 10<sup>&minus;4</sup>)),
 </p>
@@ -6868,8 +6892,8 @@ the <i>n<sub>b</sub></i> outlets, the flow is the root of the parabola at the he
 <i>n<sub>b</sub></i>.
 </p>
 <p>
-Beyond the shut-off head the argument of the root would be negative: positivePart keeps it positive and the flow
-stays at the top of the curve. The 10<sup>&minus;4</sup> keeps the relative head defined at <i>y</i> = 0. The
+Beyond the shut-off head the flow falls to zero: a pump against closed valves passes nothing and its head stays
+near the shut-off head. The 10<sup>&minus;4</sup> keeps the relative head defined at <i>y</i> = 0. The
 power counts the forward head and flow only, <i>P</i> = positivePart(<code>dp</code>, 1) <code>mTra</code> /
 (<i>&rho;</i> <i>&eta;</i>), so the pump draws no negative power while the pressures settle. The compliance of the
 inlet node is scaled by <code>m_flow_nominal</code>/<code>dp_nominal</code>.
@@ -6927,6 +6951,9 @@ the opening of the radiator valve through
 <div markdown="0">
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Hydronics</code>.</li>
+<li>November 2026: the curve is decreasing (Utilities.pumpFlow). The parabola through the same points rose
+between no flow and 0.18 times the nominal flow: beyond its top the pump kept that flow whatever the head, and
+against closed valves the pressures of the circuit rose without bound.</li>
 </ul>
 </div>
 
