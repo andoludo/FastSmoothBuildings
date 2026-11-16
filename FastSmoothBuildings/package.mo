@@ -10,7 +10,7 @@ package FastSmoothBuildings "Building models for model predictive control: close
   constant Real rhoAir(unit="kg/m3") = 1.2 "Density of air";
   constant Real RAir(unit="J/(kg.K)") = 287.0512 "Gas constant of dry air (Buildings.Media.Air)";
   annotation (
-    version="0.8.0",
+    version="0.9.0",
     versionDate="2026-11-16",
     preferredView="info",
     Documentation(info="<html>
