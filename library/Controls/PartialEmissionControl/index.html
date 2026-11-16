@@ -6936,6 +6936,13 @@ input instead.
 <td>Gain</td>
 </tr>
 <tr>
+<td>yMin</td>
+<td>Real</td>
+<td></td>
+<td>0</td>
+<td>Smallest output: the minimum opening of the valve</td>
+</tr>
+<tr>
 <td>dY</td>
 <td>Real</td>
 <td></td>
@@ -6955,6 +6962,7 @@ input instead.
 <div markdown="0">
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Controls</code>.</li>
+<li>November 2026: the smallest opening <code>yMin</code> (0 by default): a valve with a minimum position, or a radiator kept on, stays that far open whatever the zone temperature.</li>
 </ul>
 </div>
 

@@ -6852,7 +6852,7 @@
 
 
 <h1 id="emissionmonitored">EmissionMonitored<a class="headerlink" href="#emissionmonitored" title="Permanent link">&para;</a></h1>
-<p><em>Variant MonitoredSetpoint: P controller (IDEAS LimPID) between 0 and 1 towards a set point read from external data</em></p>
+<p><em>Variant MonitoredSetpoint: P controller (IDEAS LimPID) between yMin and 1 towards a set point read from external data</em></p>
 <p><code>FastSmoothBuildings.Controls.EmissionMonitored</code>, model (<a href="https://github.com/andoludo/FastSmoothBuildings/blob/main/FastSmoothBuildings/Controls/EmissionMonitored.mo">source</a>)</p>
 <div class="modelica-documentation" markdown="0">
 <h4>Purpose</h4>
@@ -6864,8 +6864,8 @@ data), instead of the schedule of
 </p>
 <h4>Equations</h4>
 <p>
-<i>y</i> = smoothLimit(<i>k</i> (<i>T<sub>Set</sub></i> &minus; <i>T<sub>Zon</sub></i>), 0, 1, <i>dY</i>), exactly
-0 and 1 beyond the blends of <a href="../../Utilities/smoothLimit/">smoothLimit</a>.
+<i>y</i> = smoothLimit(<i>k</i> (<i>T<sub>Set</sub></i> &minus; <i>T<sub>Zon</sub></i>), <code>yMin</code>, 1, <i>dY</i>), exactly
+<code>yMin</code> and 1 beyond the blends of <a href="../../Utilities/smoothLimit/">smoothLimit</a>.
 </p>
 <h4>Parameters</h4>
 <p>
@@ -6898,6 +6898,13 @@ Sets the power of the ideal heating of the east room of
 <td>Gain</td>
 </tr>
 <tr>
+<td>yMin</td>
+<td>Real</td>
+<td></td>
+<td>0</td>
+<td>Smallest output: the minimum opening of the valve</td>
+</tr>
+<tr>
 <td>dY</td>
 <td>Real</td>
 <td></td>
@@ -6910,6 +6917,7 @@ Sets the power of the ideal heating of the east room of
 <div markdown="0">
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Controls</code>.</li>
+<li>November 2026: the smallest opening <code>yMin</code> (0 by default): a valve with a minimum position, or a radiator kept on, stays that far open whatever the zone temperature.</li>
 </ul>
 </div>
 

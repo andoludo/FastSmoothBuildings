@@ -6830,7 +6830,7 @@
 
 
 <h1 id="emissionp">EmissionP<a class="headerlink" href="#emissionp" title="Permanent link">&para;</a></h1>
-<p><em>Variant PController: P controller (IDEAS LimPID) between 0 and 1</em></p>
+<p><em>Variant PController: P controller (IDEAS LimPID) between yMin and 1</em></p>
 <p><code>FastSmoothBuildings.Controls.EmissionP</code>, model (<a href="https://github.com/andoludo/FastSmoothBuildings/blob/main/FastSmoothBuildings/Controls/EmissionP.mo">source</a>)</p>
 <p>Extends <code>PartialEmissionControl</code>.</p>
 <div class="modelica-documentation" markdown="0">
@@ -6842,7 +6842,7 @@ Emission control of a zone, trano's variant <code>PController</code>: a proporti
 </p>
 <h4>Equations</h4>
 <p>
-<i>y</i> = smoothLimit(<i>k</i> (<i>T<sub>Set</sub></i> &minus; <i>T<sub>Zon</sub></i>), 0, 1, <i>dY</i>).
+<i>y</i> = smoothLimit(<i>k</i> (<i>T<sub>Set</sub></i> &minus; <i>T<sub>Zon</sub></i>), <code>yMin</code>, 1, <i>dY</i>).
 </p>
 <p>
 <a href="../../Utilities/smoothLimit/">smoothLimit</a> reaches 0 and 1 exactly and never
@@ -6865,6 +6865,7 @@ Opens the valves of the radiators of
 <div markdown="0">
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Controls</code>.</li>
+<li>November 2026: the smallest opening <code>yMin</code> (0 by default): a valve with a minimum position, or a radiator kept on, stays that far open whatever the zone temperature.</li>
 </ul>
 </div>
 
