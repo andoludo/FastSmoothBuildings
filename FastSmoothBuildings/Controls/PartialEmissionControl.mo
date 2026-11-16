@@ -6,6 +6,7 @@ partial model PartialEmissionControl
   parameter Real THeaSet(unit="K") = 294.15 "Set point when occupied";
   parameter Real THeaSetBack(unit="K") = 289.15 "Set point otherwise";
   parameter Real k = 1 "Gain";
+  parameter Real yMin(min=0, max=1) = 0 "Smallest output: the minimum opening of the valve";
   parameter Real dY = 1e-3 "Width of the smooth limits of the output";
   parameter Real dtSet(unit="s") = 60 "Duration of a change of the set point";
   Interfaces.RealInput TZon(unit="K") "Zone air temperature"
@@ -61,6 +62,7 @@ input instead.
 </html>", revisions="<html>
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Controls</code>.</li>
+<li>November 2026: the smallest opening <code>yMin</code> (0 by default): a valve with a minimum position, or a radiator kept on, stays that far open whatever the zone temperature.</li>
 </ul>
 </html>"));
 end PartialEmissionControl;

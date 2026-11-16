@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0
+
+* `Controls.EmissionP`, `Controls.EmissionMonitored` (and the base `PartialEmissionControl`): the smallest opening
+  `yMin`, 0 by default. A thermostatic valve with a minimum position, or a radiator kept on (the entrance hall of a
+  monitored house never closes its valve below 18 %), stays that far open whatever the zone temperature:
+  `y = smoothLimit(k (TSet - TZon), yMin, 1, dY)`. With the default the controls and the reference results are
+  unchanged.
+
 ## 0.8.0
 
 * `Hydronics.Pump`: with pressure-driven flows the flow follows a decreasing curve through the same points as

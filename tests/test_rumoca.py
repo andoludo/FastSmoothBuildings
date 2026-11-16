@@ -220,3 +220,29 @@ def test_the_bundle_without_examples_translates_as_the_folder() -> None:
         derivatives(folder, 0.0, np.zeros(1), inputs, parameters),
         derivatives(lean, 0.0, np.zeros(1), inputs, defaults(lean)[2]),
     )
+
+
+MINIMUM_OPENING = """
+model MinimumOpening
+  input Real u1;
+  input Real u2;
+  FastSmoothBuildings.Controls.EmissionMonitored control(k=1.5, yMin=0.18);
+  Real s(start=0, fixed=true);
+equation
+  control.TSet = u1;
+  control.TZon = u2;
+  der(s) = control.y;
+end MinimumOpening;
+"""
+
+
+@pytest.mark.parametrize(
+    ("t_set", "t_zone", "opening"),
+    [(293.15, 295.15, 0.18), (293.15, 292.75, 0.6), (295.15, 293.15, 1.0)],
+)
+def test_the_emission_control_keeps_its_minimum_opening(t_set: float, t_zone: float, opening: float) -> None:
+    """yMin: above its set point the zone's valve stays at its minimum opening, below it the proportional law."""
+    export = translate(MINIMUM_OPENING, "MinimumOpening")
+    states, _, parameters = defaults(export)
+    value = derivatives(export, 0.0, states, np.array([t_set, t_zone]), parameters)[0]
+    assert value == pytest.approx(opening, abs=1e-6)

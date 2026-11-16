@@ -1,8 +1,9 @@
 within FastSmoothBuildings.Controls;
 model EmissionMonitored
-  "Variant MonitoredSetpoint: P controller (IDEAS LimPID) between 0 and 1 towards a set point read from external
+  "Variant MonitoredSetpoint: P controller (IDEAS LimPID) between yMin and 1 towards a set point read from external
    data"
   parameter Real k = 1 "Gain";
+  parameter Real yMin(min=0, max=1) = 0 "Smallest output: the minimum opening of the valve";
   parameter Real dY = 1e-3 "Width of the smooth limits of the output";
   Interfaces.RealInput TSet(unit="K") "Set point"
     annotation (Placement(transformation(extent={{-140,40},{-100,80}})));
@@ -11,7 +12,7 @@ model EmissionMonitored
   Interfaces.RealOutput y(unit="1") "Valve opening, or share of the power of an ideal emitter"
     annotation (Placement(transformation(extent={{100,-20},{140,20}})));
 equation
-  y = Utilities.smoothLimit(k*(TSet - TZon), 0, 1, dY);
+  y = Utilities.smoothLimit(k*(TSet - TZon), yMin, 1, dY);
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={
       Rectangle(extent={{-100,-100},{100,100}}, lineColor={0,0,127}, fillColor={255,255,255},
         fillPattern=FillPattern.Solid),
@@ -27,8 +28,8 @@ data), instead of the schedule of
 </p>
 <h4>Equations</h4>
 <p>
-<i>y</i> = smoothLimit(<i>k</i> (<i>T<sub>Set</sub></i> &minus; <i>T<sub>Zon</sub></i>), 0, 1, <i>dY</i>), exactly
-0 and 1 beyond the blends of <a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimit\">smoothLimit</a>.
+<i>y</i> = smoothLimit(<i>k</i> (<i>T<sub>Set</sub></i> &minus; <i>T<sub>Zon</sub></i>), <code>yMin</code>, 1, <i>dY</i>), exactly
+<code>yMin</code> and 1 beyond the blends of <a href=\"modelica://FastSmoothBuildings.Utilities.smoothLimit\">smoothLimit</a>.
 </p>
 <h4>Parameters</h4>
 <p>
@@ -42,6 +43,7 @@ Sets the power of the ideal heating of the east room of
 </html>", revisions="<html>
 <ul>
 <li>October 2026: moved from trano's <code>FastModel.Controls</code>.</li>
+<li>November 2026: the smallest opening <code>yMin</code> (0 by default): a valve with a minimum position, or a radiator kept on, stays that far open whatever the zone temperature.</li>
 </ul>
 </html>"));
 end EmissionMonitored;
